@@ -8,25 +8,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView main_RecyclerView;
-    private RecyclerView.Adapter main_Adaper;
+    private RecyclerView.Adapter main_Adapter;
     private RecyclerView.LayoutManager main_LayoutManager;
     private List<Weather> weatherList=new ArrayList<>();
-    //private String[] myDataset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        Toolbar toolbar=(Toolbar)findViewById(R.id.tool_bar);
-//        setSupportActionBar(toolbar);
 
         main_RecyclerView=(RecyclerView)findViewById(R.id.main_recycler_view);
         main_RecyclerView.setHasFixedSize(true);
@@ -34,10 +29,8 @@ public class MainActivity extends AppCompatActivity {
         main_LayoutManager=new LinearLayoutManager(getApplicationContext());
         main_RecyclerView.setLayoutManager(main_LayoutManager);
 
-        //myDataset[]={"날씨"};
-
-        main_Adaper=new MyAdaper(weatherList);
-        main_RecyclerView.setAdapter(main_Adaper);
+        main_Adapter =new MyAdapter(weatherList);
+        main_RecyclerView.setAdapter(main_Adapter);
 
         WeatherData();
     }
@@ -79,6 +72,6 @@ public class MainActivity extends AppCompatActivity {
         weather=new Weather("온도: 40");
         weatherList.add(weather);
 
-        main_Adaper.notifyDataSetChanged();
+        main_Adapter.notifyDataSetChanged();
     }
 }

@@ -7,23 +7,20 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class MyAdaper extends RecyclerView.Adapter<MyAdaper.MyViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     private List<Weather> mDataset;
-    //private String[] mDataset;
-
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
 
         public TextView temp_text;
         public MyViewHolder(TextView v){
             super(v);
-            //temp_text=v;
             temp_text =v.findViewById(R.id.temp);
         }
     }
 
-    public MyAdaper(List<Weather> myDataset){
+    public MyAdapter(List<Weather> myDataset){
         mDataset =myDataset;
     }
 
