@@ -9,17 +9,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".living_weather" />
-        <activity android:name=".health_weather" />
-        <activity android:name=".life_radius" />
-        <activity android:name=".weather_alarm"></activity>
+        <activity android:name=".Living_Weather.LivingWeather" />
+        <activity android:name=".Health_Weather.HealthWeather" />
+        <activity android:name=".Life_Radius.LifeRadius" />
+        <activity android:name=".Weather_alarm.WeatherAlarm"></activity>
     </application>
 
 </manifest>

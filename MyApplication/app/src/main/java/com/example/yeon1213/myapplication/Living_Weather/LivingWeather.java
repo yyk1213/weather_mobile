@@ -1,14 +1,16 @@
-package com.example.yeon1213.myapplication;
+package com.example.yeon1213.myapplication.Living_Weather;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.example.yeon1213.myapplication.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class living_weather extends AppCompatActivity {
+public class LivingWeather extends AppCompatActivity {
     private RecyclerView living_RecyclerView;
     private RecyclerView.Adapter living_Adapter;
     private RecyclerView.LayoutManager living_LayoutManager;
@@ -19,8 +21,10 @@ public class living_weather extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_living_weather);
 
+        getSupportActionBar().setTitle("생활기상 지수 선택");
+
         living_RecyclerView=(RecyclerView)findViewById(R.id.recycler_view);
-        //living_RecyclerView.setHasFixedSize(true);
+        living_RecyclerView.setHasFixedSize(true);
 
         living_LayoutManager=new LinearLayoutManager(getApplicationContext());
         living_RecyclerView.setLayoutManager(living_LayoutManager);

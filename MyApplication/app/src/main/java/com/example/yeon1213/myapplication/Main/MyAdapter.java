@@ -1,15 +1,17 @@
-package com.example.yeon1213.myapplication;
+package com.example.yeon1213.myapplication.Main;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.yeon1213.myapplication.R;
+
 import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
-    private List<Weather> mDataset;
+    private List<WeatherData> mDataset;
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
 
@@ -20,13 +22,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     }
 
-    public MyAdapter(List<Weather> myDataset){
+    public MyAdapter(List<WeatherData> myDataset){
         mDataset =myDataset;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        TextView v = (TextView)LayoutInflater.from(parent.getContext()).inflate(R.layout.text_row, parent, false);
+        TextView v = (TextView)LayoutInflater.from(parent.getContext()).inflate(R.layout.weather_row, parent, false);
 
         MyViewHolder vh = new MyViewHolder(v);
         return vh;
@@ -34,12 +36,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Weather weather=mDataset.get(position);
-        holder.temp_text.setText(weather.getWeather());
+        WeatherData weatherData =mDataset.get(position);
+        holder.temp_text.setText(weatherData.getWeather());
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 }

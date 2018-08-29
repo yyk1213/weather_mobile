@@ -1,4 +1,4 @@
-package com.example.yeon1213.myapplication;
+package com.example.yeon1213.myapplication.Living_Weather;
 
 public class Living_data {
     private String living_name;
