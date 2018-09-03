@@ -3,6 +3,8 @@ package com.example.yeon1213.myapplication.Main;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,7 @@ import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
 import com.example.yeon1213.myapplication.Life_Radius.LifeRadius;
 import com.example.yeon1213.myapplication.Living_Weather.LivingWeather;
 import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +35,14 @@ public class MainActivity extends AppCompatActivity {
     //LocationManager locationManager;
     private double latitude = 36.1234;
     private double longitude = 127.1234;
-     int temp=4;
+    int temp=0;
     // private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
     // private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
 
-    //    private RecyclerView main_RecyclerView;
-//    private RecyclerView.Adapter main_Adapter;
-//    private RecyclerView.LayoutManager main_LayoutManager;
+    private RecyclerView main_RecyclerView;
+    private RecyclerView.Adapter main_Adapter;
+    private RecyclerView.LayoutManager main_LayoutManager;
+
     private List<Hourly> weatherDataList = new ArrayList<>(); //날씨 데이터 넣는 것
 
     @Override
@@ -84,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
         //locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER,0,0,MIN_TIME_BW_UPDATES,this);
         //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
-        //getWeather(latitude,longitude);
+
 //        main_RecyclerView=(RecyclerView)findViewById(R.id.main_recycler_view);
 //        main_RecyclerView.setHasFixedSize(true);
 //
@@ -137,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         wind = findViewById(R.id.wind);
     }
 
-    //데이터 형식 바꿔서 다시 작성
     private void getWeather(double latitude, double longitude) {
         Log.d("getWeather 들어옴","ㅇㅇㅇ");
 
@@ -159,6 +162,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Hourly DATA 결과",""+weatherDataList.get(temp).getTemperature().getTc());
                     if (weatherDataList != null) {
                         temperature.setText(weatherDataList.get(temp).getTemperature().getTc());
+                        precipitation.setText("강수량: " +weatherDataList.get(temp).getPrecipitation().getSinceOntime());
+                        humidity.setText("습도: "+weatherDataList.get(temp).getHumidity());
+                        wind.setText("바람: "+weatherDataList.get(temp).getWind().getWdir());
                     }
                 }
             }
