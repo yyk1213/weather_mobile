@@ -15,7 +15,7 @@ public class livingAdapter extends RecyclerView.Adapter<livingAdapter.living_Vie
 
     public static class living_ViewHolder extends RecyclerView.ViewHolder{
 
-        //text 말고 checkbox도 넣어야 함
+        //index 말고 checkbox도 넣어야 함
         public TextView living_name,living_expla;
         public living_ViewHolder(View v){
             super(v);

@@ -3,6 +3,7 @@ package com.example.yeon1213.myapplication.Main;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,15 +12,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.yeon1213.myapplication.Main.WeatherData.Dust;
 import com.example.yeon1213.myapplication.Main.WeatherData.Example;
-import com.example.yeon1213.myapplication.Main.WeatherData.Hourly;
+import com.example.yeon1213.myapplication.Main.WeatherData.HeatIndex;
 import com.example.yeon1213.myapplication.Main.WeatherData.Weather;
 import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
 import com.example.yeon1213.myapplication.Life_Radius.LifeRadius;
 import com.example.yeon1213.myapplication.Living_Weather.LivingWeather;
 import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
     //LocationManager locationManager;
     private double latitude = 36.1234;
     private double longitude = 127.1234;
-    int temp=0;
+
+    int temp = 0;
     // private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
     // private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
 
@@ -43,7 +45,10 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.Adapter main_Adapter;
     private RecyclerView.LayoutManager main_LayoutManager;
 
-    private List<Hourly> weatherDataList = new ArrayList<>(); //날씨 데이터 넣는 것
+    private Weather weatherData; //날씨 데이터 넣는 것
+    private List<Dust> dustData;//미세먼지 데이터
+    private String heatData;//생활기상 지수
+    private List<String> livingData=new ArrayList<>();//생활기상 지수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        getData(latitude, longitude);
 
-        getWeather(latitude, longitude);
         //locationManager=(LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
 
 //        LocationListener locationListener=new LocationListener() {
@@ -61,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 //                latitude=location.getLatitude();
 //                longitude=location.getLongitude();
 //                Log.d("위도,경도","위도값,경도값"+longitude);
-//                getWeather(latitude,longitude);
+//                getData(latitude,longitude);
 //
 //            }
 //
@@ -89,17 +94,17 @@ public class MainActivity extends AppCompatActivity {
         //locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER,0,0,MIN_TIME_BW_UPDATES,this);
         //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
 
-//        main_RecyclerView=(RecyclerView)findViewById(R.id.main_recycler_view);
-//        main_RecyclerView.setHasFixedSize(true);
-//
-//        main_LayoutManager=new LinearLayoutManager(getApplicationContext());
-//        main_RecyclerView.setLayoutManager(main_LayoutManager);
-//
-//        main_Adapter =new MyAdapter(weatherDataList);
-//        main_RecyclerView.setAdapter(main_Adapter);
+        //기상 지수를 담는 리사이클러 뷰
+        main_RecyclerView=findViewById(R.id.main_recycler_view);
+        main_RecyclerView.setHasFixedSize(true);
 
-        //WeatherData();
+        main_LayoutManager=new GridLayoutManager(getApplicationContext(),3);
+        main_RecyclerView.setLayoutManager(main_LayoutManager);
 
+        main_Adapter =new MyAdapter(livingData);
+        main_RecyclerView.setAdapter(main_Adapter);
+
+        //위치값에 따라 이름 바뀌게
         getSupportActionBar().setTitle("강남구 청담동");
     }
 
@@ -141,30 +146,24 @@ public class MainActivity extends AppCompatActivity {
         wind = findViewById(R.id.wind);
     }
 
-    private void getWeather(double latitude, double longitude) {
-        Log.d("getWeather 들어옴","ㅇㅇㅇ");
-
+    private void getData(double latitude, double longitude) {
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
-        Log.d("retrofit 생성","ㅇㅇㅇ");
         ApiService apiService = retrofit.create(ApiService.class);
 
-        Log.d("apiservice 생성","ㅇㅇㅇ");
-        Call<Example> call = apiService.getHourly(ApiService.APPKEY, 2, latitude, longitude);//여기서 안됨
+        Call<Example> call = apiService.getHourly(ApiService.APPKEY, 2, latitude, longitude);
 
-        Log.d("call 생성","ooo");
         call.enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
-                Log.d("onResponse 들어옴","dd");
                 if (response.isSuccessful()) {
                     //시간별 데이터를 받음
-                    weatherDataList = response.body().getWeather().getHourly();
-                    Log.d("Hourly DATA 결과",""+weatherDataList.get(temp).getTemperature().getTc());
-                    if (weatherDataList != null) {
-                        temperature.setText(weatherDataList.get(temp).getTemperature().getTc());
-                        precipitation.setText("강수량: " +weatherDataList.get(temp).getPrecipitation().getSinceOntime());
-                        humidity.setText("습도: "+weatherDataList.get(temp).getHumidity());
-                        wind.setText("바람: "+weatherDataList.get(temp).getWind().getWdir());
+                    weatherData = response.body().getWeather();
+                    Log.d("Hourly DATA 결과", "" + weatherData.getHourly().get(temp).getTemperature().getTc());
+                    if (weatherData != null) {
+                        temperature.setText(weatherData.getHourly().get(temp).getTemperature().getTc());
+                        precipitation.setText("강수량: " + weatherData.getHourly().get(temp).getPrecipitation().getSinceOntime());
+                        humidity.setText("습도: " + weatherData.getHourly().get(temp).getHumidity());
+                        wind.setText("바람: " + weatherData.getHourly().get(temp).getWind().getWdir());
                     }
                 }
             }
@@ -175,14 +174,68 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//    private void WeatherData(){
-//        WeatherData weatherData =new WeatherData("온도: 35");
-//        weatherDataList.add(weatherData);
+        Call<Example> call_heat = apiService.getHeat(ApiService.APPKEY, 2, latitude, longitude);
+
+        call_heat.enqueue(new Callback<Example>() {
+            @Override
+            public void onResponse(Call<Example> call_heat, Response<Example> response) {
+
+                if (response.isSuccessful()) {
+                    Log.d("데이터 성공?","");
+                    //시간별 데이터를 받음
+                    heatData = response.body().getWeather().getWIndex().getHeatIndex().get(0).getCurrent().getIndex();
+                    Log.d("열지수",""+ heatData);
+                    if (heatData != null) {
+                        livingData.add(heatData);
+
+                        //데이터 바뀐거 알리기
+                        main_Adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Example> call_heat, Throwable t) {
+
+            }
+        });
+    }
+
+    //미세먼지 받아오는 함수
+//    private void getDust() {
+//        Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
+//        ApiService apiService = retrofit.create(ApiService.class);
+//
+//        Call<Example> call = apiService.getDust(ApiService.APPKEY, 2, lat_string, long_string);
+//
+//        call.enqueue(new Callback<Example>() {
+//            @Override
+//            public void onResponse(Call<Example> call, Response<Example> response) {
+//
+//                if (response.isSuccessful()) {
+//                    //시간별 데이터를 받음
+//                    dustData = response.body().getData().getDust();
+//                    Log.d("미세먼지",""+dustData.get(0).getPm10().getGrade());
+//                    if (dustData != null) {
+//                        fine_dust.setText(dustData.get(0).getPm10().getGrade());
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Example> call, Throwable t) {
+//
+//            }
+//        });
+//    }
+
+//    private void putWeatherData(){
+//        Example livingData =new Example();
+//        livingData.add(weatherData);
 //
 //        weatherData =new WeatherData("온도: 40");
-//        weatherDataList.add(weatherData);
+//        weatherData.add(weatherData);
 //
 //        main_Adapter.notifyDataSetChanged();
 //    }
-    }
 }

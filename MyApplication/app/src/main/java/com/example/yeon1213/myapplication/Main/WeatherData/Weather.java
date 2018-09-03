@@ -18,4 +18,28 @@ public class Weather {
     public void setHourly(List<Hourly> hourly) {
         this.hourly = hourly;
     }
+
+    @SerializedName("dust")
+    @Expose
+    private List<Dust> dust = null;
+
+    public List<Dust> getDust() {
+        return dust;
+    }
+
+    public void setDust(List<Dust> dust) {
+        this.dust = dust;
+    }
+
+    @SerializedName("wIndex")
+    @Expose
+    private WIndex wIndex;
+
+    public WIndex getWIndex() {
+        return wIndex;
+    }
+
+    public void setWIndex(WIndex wIndex) {
+        this.wIndex = wIndex;
+    }
 }
