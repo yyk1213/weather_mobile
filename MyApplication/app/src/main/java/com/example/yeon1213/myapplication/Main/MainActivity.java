@@ -1,10 +1,16 @@
 package com.example.yeon1213.myapplication.Main;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -12,9 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.yeon1213.myapplication.Main.WeatherData.Data;
 import com.example.yeon1213.myapplication.Main.WeatherData.Dust;
-import com.example.yeon1213.myapplication.Main.WeatherData.Example;
-import com.example.yeon1213.myapplication.Main.WeatherData.HeatIndex;
 import com.example.yeon1213.myapplication.Main.WeatherData.Weather;
 import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
@@ -33,13 +38,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private TextView temperature, fine_dust, precipitation, humidity, wind;
-    //LocationManager locationManager;
-    private double latitude = 36.1234;
-    private double longitude = 127.1234;
+    private double latitude;
+    private double longitude;
 
     int temp = 0;
-    // private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
-    // private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
 
     private RecyclerView main_RecyclerView;
     private RecyclerView.Adapter main_Adapter;
@@ -56,43 +60,63 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
-        getData(latitude, longitude);
 
-        //locationManager=(LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager=(LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
 
-//        LocationListener locationListener=new LocationListener() {
-//            @Override
-//            public void onLocationChanged(Location location) {
-//                latitude=location.getLatitude();
-//                longitude=location.getLongitude();
-//                Log.d("위도,경도","위도값,경도값"+longitude);
-//                getData(latitude,longitude);
-//
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String provider, int status, Bundle extras) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderEnabled(String provider) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderDisabled(String provider) {
-//
-//            }
-//        };
-//
-//        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-//
-//            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
-//                    MY_PERMISSION_ACCESS_COARSE_LOCATION );
-//        }
-        //locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER,0,0,MIN_TIME_BW_UPDATES,this);
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+        List<String> list=locationManager.getAllProviders();
+        Log.d("위치 제공자", "" + list);
+
+        //위치 정보 수신 체크
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+                    MY_PERMISSION_ACCESS_FINE_LOCATION );
+        }
+        //최근 위치 정보 확인
+        Location location=locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        //최근 위치 정보의 위도와 경도를 받아야하나?
+        if(location!=null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+
+            Log.d("위도, 경도",""+latitude+" "+longitude);
+            //날씨 데이터 받아오기
+            //getData(latitude, longitude);
+        }
+        getData(37.5233198,127.05453650000004);
+
+        //위치 리스너 구현
+       LocationListener locationListener=new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                latitude=location.getLatitude();
+                longitude=location.getLongitude();
+                Log.d("위도,경도","위도값,경도값"+latitude+" "+longitude);
+                //getData(latitude,longitude);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,1,locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,10000,1,locationListener);
+
+        //위치정보 미 수신할 때 자원해제
+        //locationManager.removeUpdates(locationListener);
 
         //기상 지수를 담는 리사이클러 뷰
         main_RecyclerView=findViewById(R.id.main_recycler_view);
@@ -150,15 +174,15 @@ public class MainActivity extends AppCompatActivity {
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
         ApiService apiService = retrofit.create(ApiService.class);
 
-        Call<Example> call = apiService.getHourly(ApiService.APPKEY, 2, latitude, longitude);
+        Call<Data> call = apiService.getHourly(ApiService.APPKEY, 2, latitude, longitude);
 
-        call.enqueue(new Callback<Example>() {
+        call.enqueue(new Callback<Data>() {
             @Override
-            public void onResponse(Call<Example> call, Response<Example> response) {
+            public void onResponse(Call<Data> call, Response<Data> response) {
                 if (response.isSuccessful()) {
-                    //시간별 데이터를 받음
+                    //시간별 데이터를 받음-- 나중에 분별로 바꾸기
                     weatherData = response.body().getWeather();
-                    Log.d("Hourly DATA 결과", "" + weatherData.getHourly().get(temp).getTemperature().getTc());
+                    Log.d("Hourly DATA 결과", "" + weatherData.getHourly().get(temp).getGrid().getVillage());
                     if (weatherData != null) {
                         temperature.setText(weatherData.getHourly().get(temp).getTemperature().getTc());
                         precipitation.setText("강수량: " + weatherData.getHourly().get(temp).getPrecipitation().getSinceOntime());
@@ -169,16 +193,16 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Example> call, Throwable t) {
+            public void onFailure(Call<Data> call, Throwable t) {
 
             }
         });
 
-        Call<Example> call_heat = apiService.getHeat(ApiService.APPKEY, 2, latitude, longitude);
+        Call<Data> call_heat = apiService.getHeat(ApiService.APPKEY, 2, latitude, longitude);
 
-        call_heat.enqueue(new Callback<Example>() {
+        call_heat.enqueue(new Callback<Data>() {
             @Override
-            public void onResponse(Call<Example> call_heat, Response<Example> response) {
+            public void onResponse(Call<Data> call_heat, Response<Data> response) {
 
                 if (response.isSuccessful()) {
                     Log.d("데이터 성공?","");
@@ -195,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Example> call_heat, Throwable t) {
+            public void onFailure(Call<Data> call_heat, Throwable t) {
 
             }
         });
@@ -206,11 +230,11 @@ public class MainActivity extends AppCompatActivity {
 //        Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
 //        ApiService apiService = retrofit.create(ApiService.class);
 //
-//        Call<Example> call = apiService.getDust(ApiService.APPKEY, 2, lat_string, long_string);
+//        Call<Data> call = apiService.getDust(ApiService.APPKEY, 2, lat_string, long_string);
 //
-//        call.enqueue(new Callback<Example>() {
+//        call.enqueue(new Callback<Data>() {
 //            @Override
-//            public void onResponse(Call<Example> call, Response<Example> response) {
+//            public void onResponse(Call<Data> call, Response<Data> response) {
 //
 //                if (response.isSuccessful()) {
 //                    //시간별 데이터를 받음
@@ -223,19 +247,9 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //
 //            @Override
-//            public void onFailure(Call<Example> call, Throwable t) {
+//            public void onFailure(Call<Data> call, Throwable t) {
 //
 //            }
 //        });
-//    }
-
-//    private void putWeatherData(){
-//        Example livingData =new Example();
-//        livingData.add(weatherData);
-//
-//        weatherData =new WeatherData("온도: 40");
-//        weatherData.add(weatherData);
-//
-//        main_Adapter.notifyDataSetChanged();
 //    }
 }

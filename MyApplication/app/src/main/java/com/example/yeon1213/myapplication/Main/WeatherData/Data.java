@@ -3,7 +3,7 @@ package com.example.yeon1213.myapplication.Main.WeatherData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Example {
+public class Data {
     @SerializedName("weather")
     @Expose
     private Weather weather;
