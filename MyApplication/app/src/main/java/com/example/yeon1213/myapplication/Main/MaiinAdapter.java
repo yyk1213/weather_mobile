@@ -9,7 +9,7 @@ import com.example.yeon1213.myapplication.R;
 
 import java.util.List;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class MaiinAdapter extends RecyclerView.Adapter<MaiinAdapter.MyViewHolder> {
 
     private List<String> mliving_dataset;
 
@@ -22,7 +22,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     }
 
-    public MyAdapter(List<String> myDataset){
+    public MaiinAdapter(List<String> myDataset){
         this.mliving_dataset =myDataset;
     }
 
@@ -37,7 +37,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         String weatherData = mliving_dataset.get(position);
-        holder.index.setText("열 지수:"+weatherData);//우선 이 값을 넣어보기
+        holder.index.setText(weatherData);
     }
 
     @Override
