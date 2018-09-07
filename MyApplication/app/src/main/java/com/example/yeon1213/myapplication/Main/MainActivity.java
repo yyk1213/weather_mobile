@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity{
     private RecyclerView main_RecyclerView;
     private RecyclerView.Adapter main_Adapter;
     private RecyclerView.LayoutManager main_LayoutManager;
+    private LocationService locationService;
 
     private List<String> recycler_livingData = new ArrayList<>();
     private WeatherData main_weatherData;
@@ -45,27 +46,34 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //서비스 시작--파라미터 확인인
+        Intent locationService=LocationService.newIntent(getApplicationContext());
+        getApplicationContext().startService(locationService);
+
         initView();
         main_weatherData = new WeatherData();
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        //위도, 경도 값 서비스에서 받아오기
+        //latitude=locationService.getLatitude();
 
-        List<String> list = locationManager.getAllProviders();
-        Log.d("위치 제공자 확인", "" + list);
-
-        //위치 정보 수신 체크
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                    MY_PERMISSION_ACCESS_FINE_LOCATION);
-        }
-        //최근 위치 정보 확인
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        //최근 위치 정보의 위도와 경도를 받아야하나?
-        if (location != null) {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-            Log.d("위도,경도1", "위도값,경도값" + latitude + " " + longitude);
-        }
+//        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//
+//        List<String> list = locationManager.getAllProviders();
+//        Log.d("위치 제공자 확인", "" + list);
+//
+//        //위치 정보 수신 체크
+//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//
+//            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+//                    MY_PERMISSION_ACCESS_FINE_LOCATION);
+//        }
+//        //최근 위치 정보 확인
+//        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//        //최근 위치 정보의 위도와 경도를 받아야하나?
+//        if (location != null) {
+//            latitude = location.getmLatitude();
+//            longitude = location.getLongitude();
+//            Log.d("위도,경도1", "위도값,경도값" + latitude + " " + longitude);
+//        }
         //데이터 가져오면 값 넣기
         ResponseListener responseListener=new ResponseListener() {
             @Override
@@ -88,35 +96,35 @@ public class MainActivity extends AppCompatActivity{
 
         main_weatherData.setmListener(responseListener);
 
-        //위치 리스너 구현
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 1, locationListener);
-
-        //위치정보 미 수신할 때 자원해제
-        locationManager.removeUpdates(locationListener);
+//        //위치 리스너 구현
+//        LocationListener locationListener = new LocationListener() {
+//            @Override
+//            public void onLocationChanged(Location location) {
+//                latitude = location.getmLatitude();
+//                longitude = location.getLongitude();
+//            }
+//
+//            @Override
+//            public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderEnabled(String provider) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderDisabled(String provider) {
+//
+//            }
+//        };
+//        //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1, locationListener);
+//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 1, locationListener);
+//
+//        //위치정보 미 수신할 때 자원해제
+//        locationManager.removeUpdates(locationListener);
 
         //기상 지수를 담는 리사이클러 뷰
         main_RecyclerView = findViewById(R.id.main_recycler_view);
