@@ -1,5 +1,7 @@
 package com.example.yeon1213.myapplication.Main;
 
+import android.app.Activity;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.yeon1213.myapplication.DataBase.LocationDAO;
+import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
 import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
 import com.example.yeon1213.myapplication.Life_Radius.LifeRadius;
@@ -30,13 +34,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity{
     private TextView temperature, fine_dust, precipitation, humidity, wind;
     private double latitude, longitude;
-
+    private static final  String LATITUDE="com.";//패키지 명 입력해야함
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
-
+    private Activity activity;
     private RecyclerView main_RecyclerView;
     private RecyclerView.Adapter main_Adapter;
     private RecyclerView.LayoutManager main_LayoutManager;
-    private LocationService locationService;
 
     private List<String> recycler_livingData = new ArrayList<>();
     private WeatherData main_weatherData;
@@ -46,14 +49,16 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //서비스 시작--파라미터 확인인
-        Intent locationService=LocationService.newIntent(getApplicationContext());
-        getApplicationContext().startService(locationService);
+        LocationService.setServiceAlarm(this,true);
+        LocationService.isServiceAlarmOn(this);
 
         initView();
         main_weatherData = new WeatherData();
-        //위도, 경도 값 서비스에서 받아오기
-        //latitude=locationService.getLatitude();
+        //디비--열기?
+        LocationDatabase database= Room.databaseBuilder(this,LocationDatabase.class,"location.db").build();
+        LocationDAO locationDAO=database.getLocationDAO();
+        //위도, 경도 값 DB에서 받아오기
+        latitude=
 
 //        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 //
