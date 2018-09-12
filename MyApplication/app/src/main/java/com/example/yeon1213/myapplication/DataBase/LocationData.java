@@ -7,9 +7,9 @@ import android.support.annotation.NonNull;
 import java.util.Date;
 @Entity(tableName = "location")
 public class LocationData {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
-    private long mTime;
+    private int mId;
     @NonNull
     private double mLatitude;
     @NonNull
@@ -17,7 +17,18 @@ public class LocationData {
     @NonNull
     private Date mDate;
     @NonNull
+    private long mTime;
+    @NonNull
     private String mDay_of_week;//요일
+
+    @NonNull
+    public int getMId() {
+        return mId;
+    }
+
+    public void setMId(@NonNull int mId) {
+        this.mId = mId;
+    }
 
     @NonNull
     public double getMLatitude() {

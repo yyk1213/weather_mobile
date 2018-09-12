@@ -1,13 +1,14 @@
 package com.example.yeon1213.myapplication.Main;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.yeon1213.myapplication.DataBase.LocationDAO;
@@ -32,7 +34,12 @@ public class LocationService extends IntentService{
     private Long mTime;
     private Date mDate;
     private String mDay_Of_Week;
-    private static final int LOCATION_INTERVAL=1000*10;//10초로 해보기
+    private static final int LOCATION_INTERVAL=1000*10;//10초 해보기
+    private static LocationDatabase database;
+
+    public static LocationDatabase getDatabase() {
+        return database;
+    }
 
     public LocationService(){
         super(Location_Service);
@@ -54,13 +61,14 @@ public class LocationService extends IntentService{
         AlarmManager alarmManager=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         if(isOn){
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),LOCATION_INTERVAL,pi);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis()+1000,LOCATION_INTERVAL,pi);
         }else{
             alarmManager.cancel(pi);
             pi.cancel();
         }
     }
-    //알람이 켜져있는지 확인-- 언제 왜하는지 확인
+
+    //알람이 켜져있는지 확인
     public static boolean isServiceAlarmOn(Context context) {
         Intent i = LocationService.newIntent(context);
         PendingIntent pi = PendingIntent
@@ -104,7 +112,7 @@ public class LocationService extends IntentService{
         //네트워크 연결 가능한지 확인
         if(!isNetworkAvailable()) return;
         //디비
-        LocationDatabase database= Room.databaseBuilder(this,LocationDatabase.class,"location.db").build();
+        database= Room.databaseBuilder(this,LocationDatabase.class,"location.db").allowMainThreadQueries().build();
         LocationDAO locationDAO=database.getLocationDAO();
 
         //위치 매니저 초기화
@@ -169,7 +177,11 @@ public class LocationService extends IntentService{
 
         locationDAO.insert(locationData);
         Log.d("DB",""+locationDAO.getLocation().get(0).getMDate());//날짜랑 시간도 들어오는데 조금 다른거 같음
-        Log.d("DB",""+locationDAO.getLocation().get(0).getMDay_of_week());
+
+//        Resources resources=getResources();
+//        Intent i=MainActivity.newIntent(this);
+//        PendingIntent pi=PendingIntent.getActivity(this,0,i,0);
+//        Notification notification=new NotificationCompat().Builder(this).
 
     }
 
