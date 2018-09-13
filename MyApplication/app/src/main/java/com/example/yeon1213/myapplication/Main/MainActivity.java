@@ -40,19 +40,20 @@ public class MainActivity extends AppCompatActivity{
     private RecyclerView.LayoutManager main_LayoutManager;
 
     private List<String> recycler_livingData = new ArrayList<>();
-    private LocationDatabase locationDatabase;
     private WeatherData main_weatherData;
+
+    private LocationDatabase database;
 
     public static Intent newIntent(Context context){
         return new Intent(context,MainActivity.class);
     }
-
+    //좀 더 함수로 나누기
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //서비스 반복 실행
+        //서비스 반복 실행--언제까지 자료수집해야할지 생각하기
         if(!LocationService.isServiceAlarmOn(this)){
             LocationService.setServiceAlarm(this,true);
         }
@@ -60,14 +61,8 @@ public class MainActivity extends AppCompatActivity{
         initView();
         main_weatherData = new WeatherData();
 
-//        if(LocationService.getDatabase().isOpen()){
-        locationDatabase= Room.databaseBuilder(this,LocationDatabase.class,"location.db").allowMainThreadQueries().build();
-        LocationDAO locationDAO=locationDatabase.getLocationDAO();
+        location_check();
 
-            latitude=locationDAO.getLocation().get(0).getMLatitude();
-            longitude=locationDAO.getLocation().get(0).getMLongitude();
-            Log.d("메인latitude",""+locationDAO.getLocation().get(0).getMTime());
-//        }
         //데이터 가져오면 값 넣기
         ResponseListener responseListener=new ResponseListener() {
             @Override
@@ -139,5 +134,21 @@ public class MainActivity extends AppCompatActivity{
         precipitation = findViewById(R.id.precipitation);
         humidity = findViewById(R.id.humidity);
         wind = findViewById(R.id.wind);
+    }
+
+    private void location_check(){
+       database=LocationDatabase.getDataBase(this);
+       //기존에 저장된 DB 값이 있을 경우-- 패턴 값 분석해서 그 DB 값 불러오기
+        if(database.getLocationDAO().getLocation().size()>0) {
+//        if(database.isOpen()){//열리면--왜 안열렸다고 나오는거야
+           LocationDAO locationDAO = database.getLocationDAO();
+           latitude = locationDAO.getLocation().get(0).getMLatitude();
+           longitude = locationDAO.getLocation().get(0).getMLongitude();
+           Log.d("메인 위경도", "" + latitude + "," + longitude);
+//        }
+       }
+       else{//기존에 패턴 분석 DB가 없을 경우-- 우선 현재 위치를 불러오고 서비스에 위치값 저장 시작
+            //현재 위치 값 불러오는 클래스 따로 만들기--서비스, 액티비티에서 쓰임
+        }
     }
 }

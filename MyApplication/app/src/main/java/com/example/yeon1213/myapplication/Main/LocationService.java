@@ -34,12 +34,7 @@ public class LocationService extends IntentService{
     private Long mTime;
     private Date mDate;
     private String mDay_Of_Week;
-    private static final int LOCATION_INTERVAL=1000*10;//10초 해보기
-    private static LocationDatabase database;
-
-    public static LocationDatabase getDatabase() {
-        return database;
-    }
+    private static final int LOCATION_INTERVAL=1000*60;//1분으로 해보기
 
     public LocationService(){
         super(Location_Service);
@@ -61,7 +56,7 @@ public class LocationService extends IntentService{
         AlarmManager alarmManager=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         if(isOn){
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis()+1000,LOCATION_INTERVAL,pi);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime(),LOCATION_INTERVAL,pi);
         }else{
             alarmManager.cancel(pi);
             pi.cancel();
@@ -105,15 +100,12 @@ public class LocationService extends IntentService{
         }
     }
 
-    //서비스 값 전달하고 노티 주는 코드
+    //노티 주는 코드 추가, 기능별로 나누기
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.i(Location_Service,"Received an intent: "+intent);
         //네트워크 연결 가능한지 확인
         if(!isNetworkAvailable()) return;
-        //디비
-        database= Room.databaseBuilder(this,LocationDatabase.class,"location.db").allowMainThreadQueries().build();
-        LocationDAO locationDAO=database.getLocationDAO();
 
         //위치 매니저 초기화
         LocationManager mLocationManager =(LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -167,6 +159,7 @@ public class LocationService extends IntentService{
             }
         }
 
+        //위치 정보 디비에 넣기
         LocationData locationData=new LocationData();
 
         locationData.setMLatitude(mLatitude);
@@ -175,9 +168,14 @@ public class LocationService extends IntentService{
         locationData.setMDate(mDate);
         locationData.setMDay_of_week(mDay_Of_Week);
 
-        locationDAO.insert(locationData);
-        Log.d("DB",""+locationDAO.getLocation().get(0).getMDate());//날짜랑 시간도 들어오는데 조금 다른거 같음
+//        if(LocationDatabase.getDataBase(this).isOpen()){//왜 안열리지??
+            LocationDAO locationDAO= LocationDatabase.getDataBase(this).getLocationDAO();
+            locationDAO.insert(locationData);
 
+            Log.d("DB",""+locationDAO.getLocation().get(0).getMDate());//날짜랑 시간도 들어오는데 조금 다른거 같음
+//        }
+
+        //노티 주는 코드
 //        Resources resources=getResources();
 //        Intent i=MainActivity.newIntent(this);
 //        PendingIntent pi=PendingIntent.getActivity(this,0,i,0);

@@ -232,31 +232,31 @@ public class WeatherData{
 //            }
 //        });
 
-        //통신 가로채서 값 보여주는 것
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
-        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
-
-        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY,10,10,1,1,"강남구","DAILY",1.3,"json");
-        call_dust.enqueue(new Callback<FineDust>() {
-            @Override
-            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
-                Log.d("미세먼지","응답");
-                if (response.isSuccessful()) {
-                    //통합대기환경지수
-                    dust = response.body().getList().get(0).getKhaiGrade();
-                    Log.d("미세먼지", "" + dust);
-                    mListener.onIndexResponseAvailable();
-                }
-            }
-            @Override
-            public void onFailure(Call<FineDust> call_dust, Throwable t) {
-                Log.e("미세먼지 에러",""+t.toString());
-            }
-        });
+//        //통신 가로채서 값 보여주는 것
+//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//
+//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+//
+//        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
+//        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
+//
+//        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY,10,10,1,1,"강남구","DAILY",1.3,"json");
+//        call_dust.enqueue(new Callback<FineDust>() {
+//            @Override
+//            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
+//                Log.d("미세먼지","응답");
+//                if (response.isSuccessful()) {
+//                    //통합대기환경지수
+//                    dust = response.body().getList().get(0).getKhaiGrade();
+//                    Log.d("미세먼지", "" + dust);
+//                    mListener.onIndexResponseAvailable();
+//                }
+//            }
+//            @Override
+//            public void onFailure(Call<FineDust> call_dust, Throwable t) {
+//                Log.e("미세먼지 에러",""+t.toString());
+//            }
+//        });
     }
 }
