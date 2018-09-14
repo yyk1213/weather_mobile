@@ -34,7 +34,7 @@ public class LocationService extends IntentService{
     private Long mTime;
     private Date mDate;
     private String mDay_Of_Week;
-    private static final int LOCATION_INTERVAL=1000*60;//1분으로 해보기
+    private static final int LOCATION_INTERVAL=1000*600;//1시간 해보기
 
     public LocationService(){
         super(Location_Service);
@@ -122,7 +122,7 @@ public class LocationService extends IntentService{
             if (locations[i] != null) {
                 mLatitude = locations[i].getLatitude();
                 mLongitude = locations[i].getLongitude();
-                Log.d("위도,경도1", "위도값,경도값" + mLatitude + " " + mLongitude);
+                Log.d("로케이션 서비스 위도,경도", "위도값,경도값" + mLatitude + " " + mLongitude);
             }
         }
 
@@ -169,10 +169,11 @@ public class LocationService extends IntentService{
         locationData.setMDay_of_week(mDay_Of_Week);
 
 //        if(LocationDatabase.getDataBase(this).isOpen()){//왜 안열리지??
-            LocationDAO locationDAO= LocationDatabase.getDataBase(this).getLocationDAO();
+            LocationDAO locationDAO= LocationDatabase.getDataBase(this,0).getLocationDAO();
             locationDAO.insert(locationData);
 
             Log.d("DB",""+locationDAO.getLocation().get(0).getMDate());//날짜랑 시간도 들어오는데 조금 다른거 같음
+            locationDAO.update(locationData);
 //        }
 
         //노티 주는 코드

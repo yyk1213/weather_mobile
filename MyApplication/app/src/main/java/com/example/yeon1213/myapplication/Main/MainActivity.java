@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.example.yeon1213.myapplication.DataBase.LocationDAO;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
+import com.example.yeon1213.myapplication.Location_Analysis.PersonalLocationService;
 import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
 import com.example.yeon1213.myapplication.Life_Radius.LifeRadius;
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity{
         main_weatherData = new WeatherData();
 
         location_check();
+        Intent i= PersonalLocationService.newIntent(this);
+        startService(i);
 
         //데이터 가져오면 값 넣기
         ResponseListener responseListener=new ResponseListener() {
@@ -137,7 +140,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void location_check(){
-       database=LocationDatabase.getDataBase(this);
+       database=LocationDatabase.getDataBase(this,0);
+
        //기존에 저장된 DB 값이 있을 경우-- 패턴 값 분석해서 그 DB 값 불러오기
         if(database.getLocationDAO().getLocation().size()>0) {
 //        if(database.isOpen()){//열리면--왜 안열렸다고 나오는거야
@@ -149,6 +153,9 @@ public class MainActivity extends AppCompatActivity{
        }
        else{//기존에 패턴 분석 DB가 없을 경우-- 우선 현재 위치를 불러오고 서비스에 위치값 저장 시작
             //현재 위치 값 불러오는 클래스 따로 만들기--서비스, 액티비티에서 쓰임
+            //우선은 특정 값으로 고정시켜 놓기
+            latitude = 36.1234;
+            longitude=127.1234;
         }
     }
 }

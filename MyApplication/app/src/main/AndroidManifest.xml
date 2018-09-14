@@ -27,6 +27,7 @@
         <activity android:name=".Life_Radius.LifeRadius" />
         <activity android:name=".Weather_alarm.WeatherAlarm"></activity>
       <service android:name=".Main.LocationService"/>
+      <service android:name=".Location_Analysis.PersonalLocationService"/>
     </application>
 
 </manifest>

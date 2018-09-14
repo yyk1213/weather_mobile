@@ -1,11 +1,13 @@
 package com.example.yeon1213.myapplication.DataBase;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
-@Entity(tableName = "location")
+
+@Entity
 public class LocationData {
     @PrimaryKey(autoGenerate = true)
     @NonNull
@@ -14,11 +16,11 @@ public class LocationData {
     private double mLatitude;
     @NonNull
     private double mLongitude;
-    @NonNull
+
     private Date mDate;
     @NonNull
     private long mTime;
-    @NonNull
+
     private String mDay_of_week;//요일
 
     @NonNull
@@ -57,21 +59,19 @@ public class LocationData {
         this.mTime = mTime;
     }
 
-    @NonNull
     public Date getMDate() {
         return mDate;
     }
 
-    public void setMDate(@NonNull Date mDate) {
+    public void setMDate(Date mDate) {
         this.mDate = mDate;
     }
 
-    @NonNull
     public String getMDay_of_week() {
         return mDay_of_week;
     }
 
-    public void setMDay_of_week(@NonNull String mDay_of_week) {
+    public void setMDay_of_week(String mDay_of_week) {
         this.mDay_of_week = mDay_of_week;
     }
 }
