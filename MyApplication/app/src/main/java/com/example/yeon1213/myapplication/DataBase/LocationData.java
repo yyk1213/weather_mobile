@@ -23,6 +23,16 @@ public class LocationData {
 
     private String mDay_of_week;//요일
 
+    private boolean mAlarmCheck;
+
+    public boolean getMAlarmCheck() {
+        return mAlarmCheck;
+    }
+
+    public void setMAlarmCheck(boolean mAlarmCheck) {
+        this.mAlarmCheck = mAlarmCheck;
+    }
+
     @NonNull
     public int getMId() {
         return mId;

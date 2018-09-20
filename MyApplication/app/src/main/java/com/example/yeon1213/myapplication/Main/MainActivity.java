@@ -1,15 +1,9 @@
 package com.example.yeon1213.myapplication.Main;
 
-import android.app.Activity;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -25,15 +19,16 @@ import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
 import com.example.yeon1213.myapplication.Location_Analysis.PersonalLocationService;
 import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
-import com.example.yeon1213.myapplication.Life_Radius.LifeRadius;
+import com.example.yeon1213.myapplication.Life_Radius.LifeRadiusActivity;
 import com.example.yeon1213.myapplication.Living_Weather.LivingWeather;
 import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
-    private TextView temperature, fine_dust, precipitation, humidity, wind;
+    private TextView temperature, fine_dust, precipitation, humidity, wind,city,county,village;
     private double latitude, longitude;
 
     private RecyclerView main_RecyclerView;
@@ -44,7 +39,7 @@ public class MainActivity extends AppCompatActivity{
     private WeatherData main_weatherData;
 
     private LocationDatabase database;
-
+    //아직 안씀
     public static Intent newIntent(Context context){
         return new Intent(context,MainActivity.class);
     }
@@ -54,17 +49,17 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //서비스 반복 실행--언제까지 자료수집해야할지 생각하기
-        if(!LocationService.isServiceAlarmOn(this)){
-            LocationService.setServiceAlarm(this,true);
-        }
+//        //서비스 반복 실행--언제까지 자료수집해야할지 생각하기
+//        if(!LocationService.isServiceAlarmOn(this)){
+//            LocationService.setServiceAlarm(this,true);
+//        }
 
         initView();
         main_weatherData = new WeatherData();
 
         location_check();
-        Intent i= PersonalLocationService.newIntent(this);
-        startService(i);
+//        Intent i= PersonalLocationService.newIntent(this);
+//        startService(i);
 
         //데이터 가져오면 값 넣기
         ResponseListener responseListener=new ResponseListener() {
@@ -80,7 +75,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onIndexResponseAvailable() {
                 recycler_livingData = main_weatherData.getLivingData();
-                main_Adapter = new MaiinAdapter(recycler_livingData);
+                main_Adapter = new MainAdapter(recycler_livingData);
                 main_RecyclerView.setAdapter(main_Adapter);
                 main_Adapter.notifyDataSetChanged();
             }
@@ -95,10 +90,18 @@ public class MainActivity extends AppCompatActivity{
         main_LayoutManager = new GridLayoutManager(getApplicationContext(), 3);
         main_RecyclerView.setLayoutManager(main_LayoutManager);
 
-        //위치값에 따라 이름 바뀌게
-        getSupportActionBar().setTitle("강남구 청담동");
         //날씨 값 가져오기
         main_weatherData.getData(latitude,longitude);
+        //좌표를 주소로 변환
+        final Geocoder geocoder=new Geocoder(this);
+        List<Address> list=null;
+        try {
+            list = geocoder.getFromLocation(latitude, longitude, 10);
+            getSupportActionBar().setTitle(list.get(0).getAddressLine(0));
+        }catch (IOException e) {
+            e.printStackTrace();
+            Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
+        }
     }
 
     @Override
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity{
                 startActivity(i1);
                 break;
             case R.id.life_radius_setting:
-                Intent i2 = new Intent(MainActivity.this, LifeRadius.class);
+                Intent i2 = new Intent(MainActivity.this, LifeRadiusActivity.class);
                 startActivity(i2);
                 break;
             case R.id.weather_alarm:
@@ -152,7 +155,7 @@ public class MainActivity extends AppCompatActivity{
 //        }
        }
        else{//기존에 패턴 분석 DB가 없을 경우-- 우선 현재 위치를 불러오고 서비스에 위치값 저장 시작
-            //현재 위치 값 불러오는 클래스 따로 만들기--서비스, 액티비티에서 쓰임
+            //위치 받아오는 거는 서비스에서만 실행해서 그 값을 불러온다.
             //우선은 특정 값으로 고정시켜 놓기
             latitude = 36.1234;
             longitude=127.1234;

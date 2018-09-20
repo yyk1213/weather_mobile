@@ -5,11 +5,22 @@ import android.util.Log;
 import com.example.yeon1213.myapplication.Main.Weather.Data;
 import com.example.yeon1213.myapplication.Main.Weather.FineDust.FineDust;
 import com.example.yeon1213.myapplication.Main.Weather.Weather;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,6 +33,11 @@ public class WeatherData{
     private Weather weatherData; //날씨 데이터 넣는 것
     private List<String> livingData=new ArrayList<>();//리사이클러뷰에 담는 생활기상지수
     private ResponseListener mListener;//응답 값이 왔는지 확인하는 리스너
+    //위치 데이터
+    private String address;
+    private String sido;
+    private String sigugun;;
+    private String dongmyun;
     //날씨 데이터
     private String temperature;
     private String precipitation;
@@ -36,7 +52,6 @@ public class WeatherData{
     private String laundry;
     //미세먼지
     private  String dust;
-    private String county;
     private int temp=0;
 
     public WeatherData() {
@@ -74,6 +89,18 @@ public class WeatherData{
         return dust;
     }
 
+    public String getSido() {
+        return sido;
+    }
+
+    public String getSigugun() {
+        return sigugun;
+    }
+
+    public String getDongmyun() {
+        return dongmyun;
+    }
+
     public void getData(double latitude, double longitude) {
 
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
@@ -95,7 +122,6 @@ public class WeatherData{
                         precipitation=weatherData.getHourly().get(temp).getPrecipitation().getSinceOntime();
                         humidity=weatherData.getHourly().get(temp).getHumidity();
                         wind=weatherData.getHourly().get(temp).getWind().getWdir();
-                        county=weatherData.getHourly().get(0).getGrid().getCounty();
 
                         mListener.onWeatherResponseAvailable();
                     }
@@ -258,5 +284,60 @@ public class WeatherData{
 //                Log.e("미세먼지 에러",""+t.toString());
 //            }
 //        });
+
+//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//
+//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+//
+//        Gson gson=new GsonBuilder().registerTypeAdapterFactory(new DataTypeAdapterFactory()).create();
+//
+//        Retrofit geo_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create(gson)).baseUrl(ApiService.GEO_BASEURL).build();
+//        ApiService geo_apiService = geo_retrofit.create(ApiService.class);
+//
+//        Call<ResponseBody> call_GeoCode = geo_apiService.getGeoCode(ApiService.GEO_CLIENTID,ApiService.GEO_SECRETKEY,Double.toString(latitude)+","+Double.toString(longitude));
+//        call_GeoCode.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                JsonObject jsonObject=new JsonObject().get(response.body().toString()).getAsJsonObject();
+//                if(jsonObject.get("result").getAsString().contains("items")){
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//
+//            }
+//        });
+//
+//    }
+//
+//    class DataTypeAdapterFactory implements TypeAdapterFactory{
+//        @Override
+//        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+//
+//            final TypeAdapter<T> delegate=gson.getDelegateAdapter(this,type);
+//            final TypeAdapter<JsonElement> elementAdapter=gson.getAdapter(JsonElement.class);
+//
+//            return new TypeAdapter<T>(){
+//                @Override
+//                public void write(JsonWriter out, T value) throws IOException {
+//                    delegate.write(out,value);
+//                }
+//
+//                @Override
+//                public T read(JsonReader in) throws IOException {
+//                    JsonElement jsonElement=elementAdapter.read(in);
+//                    if(jsonElement.isJsonObject()){
+//                        JsonObject jsonObject=jsonElement.getAsJsonObject();
+//                        if(jsonObject.has("address")){
+//                            jsonElement=jsonObject.get("address");
+//                        }
+//                    }
+//                    return delegate.fromJsonTree(jsonElement);
+//                }
+//            }.nullSafe();
+//        }
     }
 }

@@ -9,7 +9,7 @@ import com.example.yeon1213.myapplication.R;
 
 import java.util.List;
 
-public class MaiinAdapter extends RecyclerView.Adapter<MaiinAdapter.MyViewHolder> {
+public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> {
 
     private List<String> mliving_dataset;
 
@@ -22,13 +22,13 @@ public class MaiinAdapter extends RecyclerView.Adapter<MaiinAdapter.MyViewHolder
         }
     }
 
-    public MaiinAdapter(List<String> myDataset){
+    public MainAdapter(List<String> myDataset){
         this.mliving_dataset =myDataset;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        TextView v = (TextView)LayoutInflater.from(parent.getContext()).inflate(R.layout.data_row, parent, false);
+        TextView v = (TextView)LayoutInflater.from(parent.getContext()).inflate(R.layout.main_data_row, parent, false);
 
         MyViewHolder vh = new MyViewHolder(v);
         return vh;
