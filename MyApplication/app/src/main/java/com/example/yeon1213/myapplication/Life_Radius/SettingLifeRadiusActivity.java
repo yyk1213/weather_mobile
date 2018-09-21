@@ -1,5 +1,6 @@
 package com.example.yeon1213.myapplication.Life_Radius;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
     private AutoCompleteTextView mSearchPlace;
     private PlaceAutocompleteAdapter mAdapter;
     private TextView mPlaceDetailsAttribution;
+    private TextView mPlaceDetailsText;
 
     private static final LatLngBounds BOUNDS_GRATER_KOREA=new LatLngBounds(new LatLng(35.9078, 127.7669),new LatLng(35.9078, 127.7669));
 
@@ -43,19 +46,30 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
         mGeoDataClient= Places.getGeoDataClient(this,null);
 
         mSearchPlace =findViewById(R.id.place_autocomplete_powered_by_google);
-        mPlaceDetailsAttribution = findViewById(R.id.place_address);
+        mPlaceDetailsText=findViewById(R.id.place_address);
+        mPlaceDetailsAttribution = findViewById(R.id.place_attribution);
 
-        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA,null);
+        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA);
         mSearchPlace.setAdapter(mAdapter);
 
         mSearchPlace.setOnItemClickListener(mAutocompleteClickListener);
+
+        Button clearBtn=findViewById(R.id.clear_btn);
+
+        clearBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                mSearchPlace.setText("");
+            }
+        });
+
     }
 
     private AdapterView.OnItemClickListener mAutocompleteClickListener=
             new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //디비에 넣기
+                    //디비에 넣는 코드 작성
                     final AutocompletePrediction item=mAdapter.getItem(position);
                     final String placeId=item.getPlaceId();
                     final CharSequence primaryText=item.getPrimaryText(null);
@@ -79,8 +93,9 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
                 // Get the Place object from the buffer.
                 final Place place = places.get(0);
 
-                // Format details of the place for display and show it in a TextView.
-                mPlaceDetailsAttribution.setText(formatPlaceDetails(getResources(), place.getName(),place.getAddress()));
+                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),place.getAddress()));
+
+                Log.d("결과",""+formatPlaceDetails(getResources(), place.getName(),place.getAddress()));
 
                 // Display the third party attributions if set.
                 final CharSequence thirdPartyAttribution = places.getAttributions();

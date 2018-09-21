@@ -16,7 +16,6 @@
             android:id="@+id/setting_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="위치"
             android:textSize="20dp" />
 
@@ -31,7 +30,6 @@
             android:id="@+id/clear_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="clear"/>
     </LinearLayout>
 
@@ -42,16 +40,22 @@
 
     <TextView
         android:id="@+id/location_selected"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="장소"
         android:textSize="20dp"/>
 
     <TextView
         android:id="@+id/place_address"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""/>
+
+        <TextView
+            android:id="@+id/place_attribution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""/>
     </LinearLayout>
 
     <Button

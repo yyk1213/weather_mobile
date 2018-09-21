@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="placeTypes">
+        <item>PlaceType</item>
+        <item>Address</item>
+        <item>Cities</item>
+        <item>Establishment</item>
+        <item>Geocode</item>
+        <item>Regions</item>
+        <item>All</item>
+    </array>
+    <array name="placeTypesValue">
+        <item>0</item>
+        <item>2</item>
+        <item>5</item>
+        <item>34</item>
+        <item>1007</item>
+        <item>4</item>
+        <item>0</item>
+    </array>
+</resources>
