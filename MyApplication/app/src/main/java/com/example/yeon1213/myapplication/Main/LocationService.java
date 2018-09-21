@@ -145,7 +145,7 @@ public class LocationService extends IntentService {
             Log.d(Location_Service, "network provider does not exist, " + ex.getMessage());
         }
 
-        saveLocation();
+        //saveLocation();
 
         //위치정보 미 수신할 때 자원해제
         if (mLocationManager != null) {
@@ -199,35 +199,31 @@ public class LocationService extends IntentService {
         return week;
     }
 
-    private void saveLocation(){
-
-        mTime=System.currentTimeMillis();//시간 보기 좋게 변경해야 하나?
-        mDate=new Date(mTime);
-        mDay_Of_Week=getDayOfWeek();
-
-        //위치 정보 디비에 넣기
-        LocationData locationData=new LocationData();
-        //위치 달라지는 거 체크하는 기준 위경도
-        double standardLat=mLatitude;
-        double standardLong=mLongitude;
-        //gps 동일 범위 설정--얼마로 정한다. 이 범위에서는 같은 위치로 본다
-        if((-10<=standardLat-mLatitude||standardLat-mLatitude<=10) || (-10<=standardLong-mLongitude||standardLat-mLongitude<=10)) {
-            locationData.setMLatitude(mLatitude);
-            locationData.setMLongitude(mLongitude);
-            locationData.setMTime(mTime);
-            locationData.setMDate(mDate);
-            locationData.setMDay_of_week(mDay_Of_Week);
-            locationData.setMAlarmCheck(false);
-
-//        if(LocationDatabase.getDataBase(this).isOpen()){//왜 안열리지??
-            LocationDAO locationDAO = LocationDatabase.getDataBase(this, 0).getLocationDAO();
-            locationDAO.insert(locationData);
-            //}
-
-        }
-    }
-
-    private void findNearPlace(){
-
-    }
+//    private void saveLocation(){
+//
+//        mTime=System.currentTimeMillis();//시간 보기 좋게 변경해야 하나?
+//        mDate=new Date(mTime);
+//        mDay_Of_Week=getDayOfWeek();
+//
+//        //위치 정보 디비에 넣기
+//        LocationData locationData=new LocationData();
+//        //위치 달라지는 거 체크하는 기준 위경도
+//        double standardLat=mLatitude;
+//        double standardLong=mLongitude;
+//        //gps 동일 범위 설정--얼마로 정한다. 이 범위에서는 같은 위치로 본다
+//        if((-10<=standardLat-mLatitude||standardLat-mLatitude<=10) || (-10<=standardLong-mLongitude||standardLat-mLongitude<=10)) {
+//            locationData.setMLatitude(mLatitude);
+//            locationData.setMLongitude(mLongitude);
+//            locationData.setMTime(mTime);
+//            locationData.setMDate(mDate);
+//            locationData.setMDay_of_week(mDay_Of_Week);
+//            locationData.setMAlarmCheck(false);
+//
+////        if(LocationDatabase.getDataBase(this).isOpen()){//왜 안열리지??
+//            LocationDAO locationDAO = LocationDatabase.getDataBase(this, 0).getLocationDAO();
+//            locationDAO.insert(locationData);
+//            //}
+//
+//        }
+//    }
 }

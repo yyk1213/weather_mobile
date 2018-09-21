@@ -59,8 +59,10 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/timeBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="시간설정을 누르면 timepicker이 나옴 ONcLICK"/>
+        android:text="시간설정"
+        android:textSize="20dp"/>
 
 </LinearLayout>
