@@ -49,7 +49,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
         mPlaceDetailsText=findViewById(R.id.place_address);
         mPlaceDetailsAttribution = findViewById(R.id.place_attribution);
 
-        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA);
+        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA,null);
         mSearchPlace.setAdapter(mAdapter);
 
         mSearchPlace.setOnItemClickListener(mAutocompleteClickListener);
