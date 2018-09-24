@@ -3,9 +3,12 @@ package com.example.yeon1213.myapplication.DataBase;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class LocationData {
@@ -21,7 +24,8 @@ public class LocationData {
     @NonNull
     private String mTime;
     @NonNull
-    private String mDay_of_week;//요일
+    @TypeConverters(LocationTypeConverter.class)
+    private List<String> mDay_of_week;//요일
 
     private boolean mAlarmCheck;
 
@@ -66,12 +70,13 @@ public class LocationData {
     public void setMTime(@NonNull String mTime) {
         this.mTime = mTime;
     }
+
     @NonNull
-    public String getMDay_of_week() {
+    public List<String> getMDay_of_week() {
         return mDay_of_week;
     }
 
-    public void setMDay_of_week(@NonNull String mDay_of_week) {
+    public void setMDay_of_week(@NonNull List<String> mDay_of_week) {
         this.mDay_of_week = mDay_of_week;
     }
 

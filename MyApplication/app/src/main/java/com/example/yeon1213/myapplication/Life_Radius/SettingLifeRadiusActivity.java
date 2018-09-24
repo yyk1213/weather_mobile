@@ -13,7 +13,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import com.example.yeon1213.myapplication.DataBase.LocationDAO;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
 import com.example.yeon1213.myapplication.R;
@@ -28,7 +31,9 @@ import com.google.android.gms.maps.model.RuntimeRemoteException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class SettingLifeRadiusActivity extends AppCompatActivity{
 
@@ -37,6 +42,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
     private PlaceAutocompleteAdapter mAdapter;
     private TextView mPlaceDetailsAttribution;
     private TextView mPlaceDetailsText;
+    private TextView mStartTime;
     private Button mTimeBtn;
 
     private LocationDatabase database;
@@ -44,9 +50,19 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
     private LocationData locationData=new LocationData();
     private String mLocation_name;
     private String mTime;
-    private String mDayOfWeek;
+    private List<String> mDayOfWeek;
+
+    //Day buttons
+    ToggleButton tSun;
+    ToggleButton tMon;
+    ToggleButton tTue;
+    ToggleButton tWed;
+    ToggleButton tThur;
+    ToggleButton tFri;
+    ToggleButton tSat;
 
     private static final LatLngBounds BOUNDS_GRATER_KOREA=new LatLngBounds(new LatLng(35.9078, 127.7669),new LatLng(35.9078, 127.7669));
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +75,8 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
         //places api 클라이언트
         mGeoDataClient= Places.getGeoDataClient(this,null);
 
-        mSearchPlace =findViewById(R.id.place_autocomplete_powered_by_google);
-        mPlaceDetailsText=findViewById(R.id.place_address);
-        mPlaceDetailsAttribution = findViewById(R.id.place_attribution);
-        mTimeBtn=findViewById(R.id.timeBtn);
+        InitView();
+        getDayofWeek();//요일 저장
 
         mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA,null);
         mSearchPlace.setAdapter(mAdapter);
@@ -79,29 +93,89 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
         });
         //시간 설정하고 DB에 저장
         mTimeBtn.setOnClickListener(new View.OnClickListener(){
+
+            Calendar now=Calendar.getInstance();
+            int hour=now.get(Calendar.HOUR_OF_DAY);
+            int minute=now.get(Calendar.MINUTE);
+            boolean is24Hour=true;
+
             @Override
             public void onClick(View v) {
+
                 TimePickerDialog.OnTimeSetListener onTimeSetListener=new TimePickerDialog.OnTimeSetListener() {
+
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        //시간 저장
+                       int hour=view.getCurrentHour();
+                       //DB에 시간 저장
+                        locationData.setMTime(hour+":"+minute);
 
+                        mStartTime.setText(hour+":"+minute);
+                        Log.d("시간",""+hour+" "+minute);
                     }
                 };
-
-                Calendar now=Calendar.getInstance();
-                int hour=now.get(Calendar.HOUR_OF_DAY);
-                int minute=now.get(Calendar.MINUTE);
-
-                locationData.setMTime(hour+":"+minute);
-                Log.d("시간",""+hour+" "+minute);
-                //24시간 포맷에 있는지 아닌지 확인
-                boolean is24Hour=true;
 
                 TimePickerDialog timePickerDialog=new TimePickerDialog(SettingLifeRadiusActivity.this,onTimeSetListener,hour,minute,is24Hour);
                 timePickerDialog.show();
             }
         });
 
+        //최종 DB에 저장
+        LocationDAO locationDAO=database.getLocationDAO();
+        locationDAO.insert(locationData);
+    }
+
+    private void InitView(){
+
+        mSearchPlace =findViewById(R.id.place_autocomplete_powered_by_google);
+        mPlaceDetailsText=findViewById(R.id.place_address);
+        mPlaceDetailsAttribution = findViewById(R.id.place_attribution);
+        mTimeBtn=findViewById(R.id.timeBtn);
+        mStartTime=findViewById(R.id.start_time);
+
+        //요일
+        tSun = findViewById(R.id.tSun);
+        tMon = findViewById(R.id.tMon);
+        tTue = findViewById(R.id.tTue);
+        tWed = findViewById(R.id.tWed);
+        tThur = findViewById(R.id.tThur);
+        tFri = findViewById(R.id.tFri);
+        tSat = findViewById(R.id.tSat);
+    }
+
+    //요일 선택
+    private void getDayofWeek(){
+
+        mDayOfWeek=new ArrayList<>();
+
+        if(tSun.isChecked()){
+            mDayOfWeek.add("일");
+        }
+        if(tMon.isChecked()){
+            mDayOfWeek.add("월");
+
+        }
+        if(tTue.isChecked()){
+            mDayOfWeek.add("화");
+
+        }
+        if(tWed.isChecked()){
+            mDayOfWeek.add("수");
+
+        }
+        if(tThur.isChecked()){
+            mDayOfWeek.add("목");
+
+        }
+        if(tFri.isChecked()){
+            mDayOfWeek.add("금");
+        }
+        if(tSat.isChecked()){
+            mDayOfWeek.add("토");
+        }
+        //디비에 저장
+        locationData.setMDay_of_week(mDayOfWeek);
     }
 
     private AdapterView.OnItemClickListener mAutocompleteClickListener=
@@ -134,7 +208,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity{
 
                 mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),place.getAddress()));
                 mLocation_name=formatPlaceDetails(getResources(), place.getName(),place.getAddress()).toString();
-
+                //장소 저장
                 locationData.setMLocation_name(mLocation_name);
 
                 Log.d("결과",""+formatPlaceDetails(getResources(), place.getName(),place.getAddress()));

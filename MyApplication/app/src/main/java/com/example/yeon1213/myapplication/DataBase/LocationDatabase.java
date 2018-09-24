@@ -8,8 +8,9 @@ import android.content.Context;
 import android.util.Log;
 
 @Database(entities={LocationData.class},version=1)
-@TypeConverters({DateTypeConverter.class})
+
 public abstract class LocationDatabase extends RoomDatabase{
+
     private static LocationDatabase[] INSTANCES=new LocationDatabase[8];
     private static final String[] DAY_DB={"sun.db","mon.db", "tue.db","wed.db", "thur.db","fri.db","sat.db"};
 

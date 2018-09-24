@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.provider.CalendarContract;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -25,6 +27,7 @@ import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
@@ -38,11 +41,8 @@ public class MainActivity extends AppCompatActivity{
     private List<String> recycler_livingData = new ArrayList<>();
     private WeatherData main_weatherData;
 
-    private LocationDatabase database;
-    //아직 안씀
-    public static Intent newIntent(Context context){
-        return new Intent(context,MainActivity.class);
-    }
+    private LocationDatabase database=LocationDatabase.getDataBase(this,0);
+
     //좀 더 함수로 나누기
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +143,6 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void location_check(){
-       database=LocationDatabase.getDataBase(this,0);
 
        //기존에 저장된 DB 값이 있을 경우-- 패턴 값 분석해서 그 DB 값 불러오기
         if(database.getLocationDAO().getLocation().size()>0) {
@@ -160,5 +159,17 @@ public class MainActivity extends AppCompatActivity{
             latitude = 36.1234;
             longitude=127.1234;
         }
+    }
+
+    private void createNotification(){
+        //현재 시간 1시간 후와 db에 저장된 시간이 일치할 경우 noti를 띄워서 날 씨를 알려준다.
+
+        Calendar now=Calendar.getInstance();
+        int hour=now.get(Calendar.HOUR_OF_DAY);
+        int minute=now.get(Calendar.MINUTE);
+        boolean is24hour=true;
+
+        NotificationCompat.Builder mBuilder=new NotificationCompat.Builder(this);
+
     }
 }

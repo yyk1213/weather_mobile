@@ -46,7 +46,7 @@ public class PersonalLocationService extends IntentService {
 
             dayData.setMLatitude(locationData.getMLatitude());
             dayData.setMLongitude(locationData.getMLongitude());
-            dayData.setMDate(locationData.getMDate());
+            //dayData.setMDate(locationData.getMDate());
             dayData.setMTime(locationData.getMTime());
 
             String day_of_week = locationData.getMDay_of_week();

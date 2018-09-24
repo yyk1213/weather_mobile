@@ -42,6 +42,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         mRadiusRecyclerView.setLayoutManager(radius_LayoutManager);
 
         fab=findViewById(R.id.radius_plus_btn);
+        fab.setOnClickListener(this);
 
         database=LocationDatabase.getDataBase(this,0);
 
@@ -140,7 +141,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
             LocationData radius=mRadius.get(position);
             holder.mLocationTextView.setText(Double.toString(radius.getMLatitude()));
-            holder.mDayOfWeekTextView.setText(radius.getMDay_of_week());
+            holder.mDayOfWeekTextView.setText(radius.getMDay_of_week().toString());
             holder.mAlarmSwitch.setChecked(radius.getMAlarmCheck());
         }
 
