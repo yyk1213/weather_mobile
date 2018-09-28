@@ -19,6 +19,7 @@ import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
 import com.example.yeon1213.myapplication.R;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class LifeRadiusActivity extends AppCompatActivity implements View.OnClickListener{
@@ -27,6 +28,13 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
     private RecyclerView.LayoutManager radius_LayoutManager;
     private LocationDatabase database;
     public FloatingActionButton fab;
+    public static final String EXTRA_DATA="com.example.yeon1213.myapplication.Life_Radius.location_data";
+
+    public static Intent newIntent(Context context,LocationData locationData){
+        Intent dataIntent=new Intent(context, LifeRadiusActivity.class);
+//        dataIntent.putExtra(EXTRA_DATA, locationData);
+        return dataIntent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +52,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         fab=findViewById(R.id.radius_plus_btn);
         fab.setOnClickListener(this);
 
-        database=LocationDatabase.getDataBase(this,0);
+        database=LocationDatabase.getDataBase(this);
 
         updateUI();
     }
@@ -64,6 +72,11 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
         mRadiusRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private class RadiusHolder extends RecyclerView.ViewHolder implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener{
@@ -96,11 +109,14 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             if(database.getLocationDAO().getLocation().get(position).getMAlarmCheck()){
 
                 Intent settingRadiusIntent=new Intent(LifeRadiusActivity.this,SettingLifeRadiusActivity.class);
-                startActivity(settingRadiusIntent);
+                settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_KEY,"Hello");
+                startActivityForResult(settingRadiusIntent,0);
             }else{
                 itemView.setEnabled(false);
             }
         }
+
+
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -109,6 +125,9 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
                 int position=(int)mView.getTag();
                 Log.d("스위치 체크",""+position+" "+isChecked);
                 LocationData locationData=database.getLocationDAO().getLocation().get(position);
+
+//                Intent i=LifeRadiusActivity.newIntent(SettingLifeRadiusActivity, locationData);
+
                 locationData.setMAlarmCheck(isChecked);
 
                 database.getLocationDAO().update(locationData);
@@ -140,14 +159,63 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             holder.mView.setTag(position);
 
             LocationData radius=mRadius.get(position);
-            holder.mLocationTextView.setText(Double.toString(radius.getMLatitude()));
-            holder.mDayOfWeekTextView.setText(radius.getMDay_of_week().toString());
+            holder.mLocationTextView.setText(radius.getMLocation_name());
+            holder.mTimeTextView.setText(radius.getMTime());
+            holder.mDayOfWeekTextView.setText(getDayOfWeek(radius.getMDay_of_week()));
             holder.mAlarmSwitch.setChecked(radius.getMAlarmCheck());
+
+            Log.d("요일",""+getDayOfWeek(radius.getMDay_of_week()));
         }
 
         @Override
         public int getItemCount() {
             return mRadius.size();
+        }
+
+        private String getDayOfWeek(int dayOfWeek){
+
+            String mDayOfWeek="";
+
+            for(int day=0; day<7; day++) {
+                switch (day) {
+                    case 0:
+                        if (((dayOfWeek >> day) & 1) == 1) {//월요일
+                            mDayOfWeek +="월";
+                        }
+                        break;
+                    case 1:
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="화";
+                        }
+                        break;
+                    case 2:
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="수";
+                        }
+                        break;
+                    case 3:
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="목";
+                        }
+                        break;
+                    case 4:
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="금";
+                        }
+                        break;
+                    case 5:
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="토";
+                        }
+                        break;
+                    case 6:
+                        if (((dayOfWeek >> day) & 1) == 1) {//일요일
+                            mDayOfWeek +="일";
+                        }
+                        break;
+                }
+            }
+            return mDayOfWeek;
         }
     }
 }

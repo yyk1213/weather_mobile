@@ -8,36 +8,22 @@ import android.content.Context;
 import android.util.Log;
 
 @Database(entities={LocationData.class},version=1)
-
+@TypeConverters({LocationTypeConverter.class})
 public abstract class LocationDatabase extends RoomDatabase{
 
-    private static LocationDatabase[] INSTANCES=new LocationDatabase[8];
-    private static final String[] DAY_DB={"sun.db","mon.db", "tue.db","wed.db", "thur.db","fri.db","sat.db"};
+    private static LocationDatabase INSTANCES;
+    //private static final String[] DAY_DB={"sun.db","mon.db", "tue.db","wed.db", "thur.db","fri.db","sat.db"};
 
     public abstract LocationDAO getLocationDAO();
 
-    public static LocationDatabase getDataBase(final Context context,int order) {
+    public static LocationDatabase getDataBase(final Context context) {
 
-        if (INSTANCES[order] == null) {
-            if (order == 0) {
-                Log.d("instance null", "널이야");
-                INSTANCES[order] = Room.databaseBuilder(context.getApplicationContext(), LocationDatabase.class, "location.db")
-                        .allowMainThreadQueries()
-                        .build();
-            }else if(order==8){
-                INSTANCES[order] = Room.databaseBuilder(context.getApplicationContext(), LocationDatabase.class, "final.db")
-                        .allowMainThreadQueries()
-                        .build();
-            }
-            else {
-                INSTANCES[order] = Room.databaseBuilder(context.getApplicationContext(), LocationDatabase.class, DAY_DB[order - 1])
-                        .allowMainThreadQueries()
-                        .build();
-            }
-            return INSTANCES[order];
+        if (INSTANCES == null) {
+            Log.d("instance null", "널이야");
+            INSTANCES = Room.databaseBuilder(context.getApplicationContext(), LocationDatabase.class, "location.db")
+                    .allowMainThreadQueries()
+                    .build();
         }
-        else {
-            return INSTANCES[order];
-        }
+            return INSTANCES;
     }
 }

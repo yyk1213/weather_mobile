@@ -103,4 +103,10 @@
             android:layout_height="wrap_content"></include>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/saveBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="저장"
+        android:layout_gravity="center" />
 </LinearLayout>

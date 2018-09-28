@@ -1,5 +1,6 @@
 package com.example.yeon1213.myapplication.DataBase;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -14,19 +15,27 @@ import java.util.List;
 public class LocationData {
     @PrimaryKey(autoGenerate = true)
     @NonNull
+    @ColumnInfo(name = "mId")
     private int mId;
-
+    @NonNull
+    @ColumnInfo(name = "mLatitude")
     private double mLatitude;
-
+    @NonNull
+    @ColumnInfo(name = "mLongitude")
     private double mLongitude;
+
+    @ColumnInfo(name = "mLocation_name")
     @NonNull
     private String mLocation_name;
     @NonNull
+    @ColumnInfo(name = "mTime")
     private String mTime;
-    @NonNull
-    @TypeConverters(LocationTypeConverter.class)
-    private List<String> mDay_of_week;//요일
 
+    @NonNull
+    @ColumnInfo(name = "mDay_of_week")
+    private int mDay_of_week;
+
+    @ColumnInfo(name = "mAlarmCheck")
     private boolean mAlarmCheck;
 
     public boolean getMAlarmCheck() {
@@ -45,20 +54,20 @@ public class LocationData {
     public void setMId(@NonNull int mId) {
         this.mId = mId;
     }
-
+    @NonNull
     public double getMLatitude() {
         return mLatitude;
     }
 
-    public void setMLatitude(double mLatitude) {
+    public void setMLatitude(@NonNull double mLatitude) {
         this.mLatitude = mLatitude;
     }
-
+    @NonNull
     public double getMLongitude() {
         return mLongitude;
     }
 
-    public void setMLongitude(double mLongitude) {
+    public void setMLongitude(@NonNull double mLongitude) {
         this.mLongitude = mLongitude;
     }
 
@@ -72,20 +81,20 @@ public class LocationData {
     }
 
     @NonNull
-    public List<String> getMDay_of_week() {
-        return mDay_of_week;
-    }
-
-    public void setMDay_of_week(@NonNull List<String> mDay_of_week) {
-        this.mDay_of_week = mDay_of_week;
-    }
-
-    @NonNull
     public String getMLocation_name() {
         return mLocation_name;
     }
 
     public void setMLocation_name(@NonNull String mLocation_name) {
         this.mLocation_name = mLocation_name;
+    }
+
+    @NonNull
+    public int getMDay_of_week() {
+        return mDay_of_week;
+    }
+
+    public void setMDay_of_week(@NonNull int mDay_of_week) {
+        this.mDay_of_week = mDay_of_week;
     }
 }

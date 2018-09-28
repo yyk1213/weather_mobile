@@ -1,21 +1,27 @@
 package com.example.yeon1213.myapplication.DataBase;
 
 import android.arch.persistence.room.TypeConverter;
-import android.arch.persistence.room.TypeConverters;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import java.util.Date;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class LocationTypeConverter {
 
+    Gson gson=new Gson();
+
     @TypeConverter
-    public static String convertListToString(List<String> list) {
+    public String convertListToString(List<String> list) {
 
-        Gson gson=new Gson();
-        String json=gson.toJson(list);
+        return gson.toJson(list);
+    }
 
-        return json;
+    @TypeConverter
+    public List<String> convertStringToList(String str){
+        Type listType=new TypeToken<List<String>>() {}.getType();
+
+        return gson.fromJson(str,listType);
     }
 }

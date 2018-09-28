@@ -6,8 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
-    <application
+   <application
         android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,10 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBJp9XK3ChBsBm44Ag7wKDWhbhuubdW-Ao"/>
+            android:value="AIzaSyBJp9XK3ChBsBm44Ag7wKDWhbhuubdW-Ao" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -34,9 +35,21 @@
         <activity android:name=".Health_Weather.HealthWeather" />
         <activity android:name=".Life_Radius.LifeRadiusActivity" />
         <activity android:name=".Weather_alarm.WeatherAlarm" />
+
         <service android:name=".Main.LocationService" />
         <service android:name=".Location_Analysis.PersonalLocationService" />
-        <activity android:name=".Life_Radius.SettingLifeRadiusActivity"></activity>
+
+        <activity android:name=".Life_Radius.SettingLifeRadiusActivity" />
+
+        <receiver
+            android:name=".Alarm.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="AlarmReceiver" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
