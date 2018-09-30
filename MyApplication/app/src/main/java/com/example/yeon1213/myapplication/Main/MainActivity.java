@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -28,6 +29,7 @@ import com.example.yeon1213.myapplication.Life_Radius.LifeRadiusActivity;
 import com.example.yeon1213.myapplication.Living_Weather.LivingWeather;
 import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,10 +47,6 @@ public class MainActivity extends AppCompatActivity{
     private WeatherData main_weatherData;
 
     private LocationDatabase database;
-
-    public static Intent newIntent(Context context){
-        return new Intent(context,MainActivity.class);
-    }
 
     //좀 더 함수로 나누기
     @Override
@@ -140,8 +138,8 @@ public class MainActivity extends AppCompatActivity{
             calendar.set(calendar.MINUTE,mMin);
 
             //요일 받아오기
-            int mDayOfWeek=locationData.getMDay_of_week();
-            getDayOfWeek(mDayOfWeek,calendar);
+//            int mDayOfWeek=locationData.getMDay_of_week();
+//            getDayOfWeek(mDayOfWeek,calendar);
 
             Log.d("캘린더",""+calendar.toString());
             long currentTime=System.currentTimeMillis();
@@ -154,6 +152,8 @@ public class MainActivity extends AppCompatActivity{
             }
 
             Intent receiverIntent=new Intent(this,AlarmReceiver.class);
+            receiverIntent.putExtra(AlarmReceiver.EXTRA_ALARM_ID,mAlarmId);
+
             //알람매니저 등록
             AlarmManager alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
             //알람 설정 시각에 발생하는 인텐트
@@ -164,41 +164,42 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void getDayOfWeek(int dayOfWeek,Calendar calendar){
-        for(int day=0; day<7; day++) {//0이 월요일, 6이 일요일
+
+        for(int day=0; day<7; day++) {
             switch (day) {
                 case 0:
-                    if (((dayOfWeek >> day) & 1) == 1) {//월요일
-                        calendar.add(Calendar.DAY_OF_WEEK,2);
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
                     }
                     break;
                 case 1:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,3);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
                     }
                     break;
                 case 2:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,4);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.TUESDAY);
                     }
                     break;
                 case 3:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,5);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.WEDNESDAY);
                     }
                     break;
                 case 4:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,6);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.THURSDAY);
                     }
                     break;
                 case 5:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,7);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
                     }
                     break;
                 case 6:
-                    if (((dayOfWeek >> day) & 1) == 1) {//일요일
-                        calendar.add(Calendar.DAY_OF_WEEK,1);
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
                     }
                     break;
             }

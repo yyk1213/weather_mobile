@@ -109,4 +109,13 @@
         android:layout_height="wrap_content"
         android:text="저장"
         android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/removeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="삭제"
+        android:layout_gravity="center"
+        android:enabled="false"/>
+
 </LinearLayout>

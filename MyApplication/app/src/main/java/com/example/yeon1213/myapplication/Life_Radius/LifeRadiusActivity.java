@@ -28,13 +28,6 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
     private RecyclerView.LayoutManager radius_LayoutManager;
     private LocationDatabase database;
     public FloatingActionButton fab;
-    public static final String EXTRA_DATA="com.example.yeon1213.myapplication.Life_Radius.location_data";
-
-    public static Intent newIntent(Context context,LocationData locationData){
-        Intent dataIntent=new Intent(context, LifeRadiusActivity.class);
-//        dataIntent.putExtra(EXTRA_DATA, locationData);
-        return dataIntent;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,14 +96,19 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
         @Override
         public void onClick(View v) {
-            //편집하는 내용이 나와야함
-                //db에서 저장된 데이터를 가져와서 그 내용의 값을 그 내용을 화면에 보이게 해야한다.
+
             int position=(int)mView.getTag();
+            //알람이 활성화 돼 있으면 db 내용을 편잡하게 한다.
             if(database.getLocationDAO().getLocation().get(position).getMAlarmCheck()){
 
+                int id=database.getLocationDAO().getLocation().get(position).getMId();
+
                 Intent settingRadiusIntent=new Intent(LifeRadiusActivity.this,SettingLifeRadiusActivity.class);
-                settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_KEY,"Hello");
+                settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_DATA_ID,id);
+                settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_DATA_POSITION, position);
+
                 startActivityForResult(settingRadiusIntent,0);
+
             }else{
                 itemView.setEnabled(false);
             }
@@ -179,38 +177,38 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             for(int day=0; day<7; day++) {
                 switch (day) {
                     case 0:
-                        if (((dayOfWeek >> day) & 1) == 1) {//월요일
-                            mDayOfWeek +="월";
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="일";
                         }
                         break;
                     case 1:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="화";
+                            mDayOfWeek +="월";
                         }
                         break;
                     case 2:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="수";
+                            mDayOfWeek +="화";
                         }
                         break;
                     case 3:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="목";
+                            mDayOfWeek +="수";
                         }
                         break;
                     case 4:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="금";
+                            mDayOfWeek +="목";
                         }
                         break;
                     case 5:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="토";
+                            mDayOfWeek +="금";
                         }
                         break;
                     case 6:
-                        if (((dayOfWeek >> day) & 1) == 1) {//일요일
-                            mDayOfWeek +="일";
+                        if (((dayOfWeek >> day) & 1) == 1) {
+                            mDayOfWeek +="토";
                         }
                         break;
                 }

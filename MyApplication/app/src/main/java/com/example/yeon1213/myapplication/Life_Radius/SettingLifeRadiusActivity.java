@@ -3,6 +3,7 @@ package com.example.yeon1213.myapplication.Life_Radius;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +25,6 @@ import com.example.yeon1213.myapplication.Alarm.AlarmReceiver;
 import com.example.yeon1213.myapplication.DataBase.LocationDAO;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
-import com.example.yeon1213.myapplication.Main.MainActivity;
 import com.example.yeon1213.myapplication.R;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -51,16 +51,18 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     private Button mTimeBtn;
     private Button mSaveBtn;
     private Button mClearBtn;
+    private Button mRemoveBtn;
 
     private LocationDatabase database;
     //저장할 데이터
     private LocationData locationData=new LocationData();
     private String mLocation_name;
     private int mDayOfWeek =0;
-    private int mAlarm_id;
 
     public static final String EXTRA_KEY="KEY";
-
+    private int item_id;
+    private int position;
+    private AlarmManager alarmManager;
     //Day of week buttons
     ToggleButton tSun;
     ToggleButton tMon;
@@ -71,7 +73,16 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     ToggleButton tSat;
 
     private static final LatLngBounds BOUNDS_GRATER_KOREA=new LatLngBounds(new LatLng(35.9078, 127.7669),new LatLng(35.9078, 127.7669));
-    private static final String EXTRA_ALARM_ID="com.example.yeon1213.myapplication.Life_Radius.alarm_id";
+    public static final String EXTRA_DATA_ID="com.example.yeon1213.myapplication.Life_Radius.location_data_id";
+    public static final String EXTRA_DATA_POSITION="com.example.yeon1213.myapplication.Life_Radius.location_data_position";
+
+    public static Intent newIntent(Context context, int locationData_id,int data_position){
+        Intent dataIntent=new Intent(context, SettingLifeRadiusActivity.class);
+        dataIntent.putExtra(EXTRA_DATA_ID, locationData_id);
+        dataIntent.putExtra(EXTRA_DATA_POSITION,data_position);
+
+        return dataIntent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +101,23 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
         InitView();
 
-        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA,null);
-        mSearchPlace.setAdapter(mAdapter);
+        position=getIntent().getIntExtra(EXTRA_DATA_POSITION,0);
+        item_id=getIntent().getIntExtra(EXTRA_DATA_ID,0);
 
-        mSearchPlace.setOnItemClickListener(mAutocompleteClickListener);
-        mTimeBtn.setOnClickListener(this);
-        mClearBtn.setOnClickListener(this);
-        mSaveBtn.setOnClickListener(this);
+        if(item_id!=0){
+            LocationData existData=database.getLocationDAO().getData(item_id);
+
+            int dayofWeek=existData.getMDay_of_week();
+
+            mPlaceDetailsText.setText(existData.getMLocation_name());
+            mStartTime.setText(existData.getMTime());
+            //요일도 가져오기
+            checkDayOfWeek(dayofWeek);
+            //저장을 수정버튼으로 바꾸고 db update
+            mSaveBtn.setText("수정");
+            mRemoveBtn.setEnabled(true);
+
+        }
     }
 
     @Override
@@ -140,18 +161,47 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 locationData.setMAlarmCheck(true);
 
                 LocationDAO locationDAO=database.getLocationDAO();
-                locationDAO.insert(locationData);
-               //알람매니저로 알람 등록
+
+                if(mSaveBtn.getText()=="수정"){
+
+                    LocationData updateData=locationDAO.getData(item_id);
+                    locationDAO.update(updateData);
+                }
+                else {
+                    locationDAO.insert(locationData);
+                }
+                //알람매니저로 알람 등록
                 setAlarm();
 
                 setResult(RESULT_OK);
                 finish();
 
                 //알람 리스트 화면으로 돌아가기
-//                Intent radiusIntent=new Intent(this,LifeRadiusActivity.class);
-//                startActivityForResult(radiusIntent);
+                Intent radiusIntent=new Intent(this,LifeRadiusActivity.class);
+                startActivityForResult(radiusIntent,0);
+
                 break;
+
+            case R.id.removeBtn:
+                LocationData removeData=database.getLocationDAO().getLocation().get(position);
+                database.getLocationDAO().delete(removeData);//db항목 삭제
+                //알람 지우기---오류
+                //removeAlarm(item_id);
+
+                setResult(RESULT_OK);
+                finish();
+
+                //알람 리스트 화면으로 돌아가기
+                Intent listIntent=new Intent(this,LifeRadiusActivity.class);
+                startActivityForResult(listIntent,0);
         }
+    }
+
+    private void removeAlarm(int alarm_ID){
+
+        Intent receiverIntent=new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(this, alarm_ID,receiverIntent,0);
+        alarmManager.cancel(pendingIntent);
     }
 
     private void setAlarm(){
@@ -163,8 +213,6 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         String[] time=mTime.split(":");
         mHour=Integer.parseInt(time[0].trim());
         mMin=Integer.parseInt(time[1].trim());
-
-        Log.d("시간알기", ""+mHour+":"+mMin);
 
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(new Date());
@@ -187,7 +235,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
         Intent receiverIntent=new Intent(this,AlarmReceiver.class);
         //알람매니저 등록
-        AlarmManager alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
+        alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
         //알람 설정 시각에 발생하는 인텐트
         PendingIntent alarmIntent= PendingIntent.getBroadcast(this,mAlarmId,receiverIntent,0);
         //알람 설정
@@ -203,6 +251,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         mTimeBtn=findViewById(R.id.timeBtn);
         mStartTime=findViewById(R.id.start_time);
         mSaveBtn=findViewById(R.id.saveBtn);
+        mRemoveBtn=findViewById(R.id.removeBtn);
 
         //요일
         tSun = findViewById(R.id.tSun);
@@ -220,31 +269,40 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         tThur.setOnCheckedChangeListener(this);
         tFri.setOnCheckedChangeListener(this);
         tSat.setOnCheckedChangeListener(this);
+
+        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA,null);
+        mSearchPlace.setAdapter(mAdapter);
+
+        mSearchPlace.setOnItemClickListener(mAutocompleteClickListener);
+        mTimeBtn.setOnClickListener(this);
+        mClearBtn.setOnClickListener(this);
+        mSaveBtn.setOnClickListener(this);
+        mRemoveBtn.setOnClickListener(this);
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch(buttonView.getId()){
             case R.id.tSun:
-               setDayOfWeek(6,isChecked);
+               setDayOfWeek(0,isChecked);
                 break;
             case R.id.tMon:
-                setDayOfWeek(0,isChecked);
-                break;
-            case R.id.tTue:
                 setDayOfWeek(1,isChecked);
                 break;
-            case R.id.tWed:
+            case R.id.tTue:
                 setDayOfWeek(2,isChecked);
                 break;
-            case R.id.tThur:
+            case R.id.tWed:
                 setDayOfWeek(3,isChecked);
                 break;
-            case R.id.tFri:
+            case R.id.tThur:
                 setDayOfWeek(4,isChecked);
                 break;
-            case R.id.tSat:
+            case R.id.tFri:
                 setDayOfWeek(5,isChecked);
+                break;
+            case R.id.tSat:
+                setDayOfWeek(6,isChecked);
                 break;
         }
 
@@ -258,43 +316,86 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         else
             mDayOfWeek &=~(1<<day);
     }
-    //중복된 코드가 많다
-    private void getDayOfWeek(int dayOfWeek, Calendar calendar){
-        for(int day=0; day<7; day++) {//0이 월요일, 6이 일요일
+
+    private void getDayOfWeek(int dayOfWeek,Calendar calendar){
+        for(int day=0; day<7; day++) {
             switch (day) {
                 case 0:
-                    if (((dayOfWeek >> day) & 1) == 1) {//월요일
-                        calendar.add(Calendar.DAY_OF_WEEK,2);
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
                     }
                     break;
                 case 1:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,3);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
                     }
                     break;
                 case 2:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,4);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.TUESDAY);
                     }
                     break;
                 case 3:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,5);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.WEDNESDAY);
                     }
                     break;
                 case 4:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,6);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.THURSDAY);
                     }
                     break;
                 case 5:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,7);
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
                     }
                     break;
                 case 6:
-                    if (((dayOfWeek >> day) & 1) == 1) {//일요일
-                        calendar.add(Calendar.DAY_OF_WEEK,1);
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
+                    }
+                    break;
+            }
+        }
+
+    }
+
+    private void checkDayOfWeek(int dayOfWeek) {
+        for (int day = 0; day < 7; day++) {
+            switch (day) {
+                case 0:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tSun.setChecked(true);
+                    }
+                    break;
+                case 1:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tMon.setChecked(true);
+                    }
+                    break;
+                case 2:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tTue.setChecked(true);
+                    }
+                    break;
+                case 3:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tWed.setChecked(true);
+                    }
+                    break;
+                case 4:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tThur.setChecked(true);
+                    }
+                    break;
+                case 5:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tFri.setChecked(true);
+                    }
+                    break;
+                case 6:
+                    if (((dayOfWeek >> day) & 1) == 1) {
+                        tSat.setChecked(true);
                     }
                     break;
             }
