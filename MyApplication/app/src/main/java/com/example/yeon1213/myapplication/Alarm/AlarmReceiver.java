@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.UnicodeSetSpanner;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.yeon1213.myapplication.DataBase.LocationData;
@@ -52,6 +54,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         locationDatabase= LocationDatabase.getDataBase(context);
         int id=intent.getIntExtra(EXTRA_ALARM_ID,0);
+
+        Log.e("리시버 id 값", ""+id);
         weather_data=new WeatherData();
 
         LocationData locationData=locationDatabase.getLocationDAO().getData(id);

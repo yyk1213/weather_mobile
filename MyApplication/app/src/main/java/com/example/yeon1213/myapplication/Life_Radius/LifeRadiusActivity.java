@@ -15,11 +15,12 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.example.yeon1213.myapplication.Alarm.Alarm;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
+import com.example.yeon1213.myapplication.Main.MainActivity;
 import com.example.yeon1213.myapplication.R;
 
-import java.util.Calendar;
 import java.util.List;
 
 public class LifeRadiusActivity extends AppCompatActivity implements View.OnClickListener{
@@ -28,6 +29,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
     private RecyclerView.LayoutManager radius_LayoutManager;
     private LocationDatabase database;
     public FloatingActionButton fab;
+    private Alarm alarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         fab.setOnClickListener(this);
 
         database=LocationDatabase.getDataBase(this);
+        alarm=new Alarm();
 
         updateUI();
     }
@@ -118,20 +121,21 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//            if(isChecked){
-                //체크가 되면 뷰항목을 누를 수 있다.--뷰항목 활성화
-                int position=(int)mView.getTag();
-                Log.d("스위치 체크",""+position+" "+isChecked);
-                LocationData locationData=database.getLocationDAO().getLocation().get(position);
 
-//                Intent i=LifeRadiusActivity.newIntent(SettingLifeRadiusActivity, locationData);
+            int position=(int)mView.getTag();
+            LocationData locationData=database.getLocationDAO().getLocation().get(position);
 
-                locationData.setMAlarmCheck(isChecked);
+            if(isChecked){
+                //체크가 되면 뷰항목을 누를 수 있고 알람이 설정된다.
+                alarm.setAlarm(getApplicationContext(), locationData);
+                locationData.setMAlarmCheck(true);
 
-                database.getLocationDAO().update(locationData);
-//            }else{
-                //누를 수 없다.--비활성화
-//            }
+            }else{
+                //뷰항목이 비활성화 되고 알람이 취소된다.
+                alarm.removeAlarm(getApplicationContext(),locationData);
+                locationData.setMAlarmCheck(false);
+            }
+            database.getLocationDAO().update(locationData);
         }
     }
 
@@ -215,5 +219,14 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             }
             return mDayOfWeek;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
+
+        Intent mainIntent=new Intent(this,MainActivity.class);
+        startActivityForResult(mainIntent,0);
     }
 }

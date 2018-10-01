@@ -21,6 +21,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.example.yeon1213.myapplication.Alarm.Alarm;
 import com.example.yeon1213.myapplication.Alarm.AlarmReceiver;
 import com.example.yeon1213.myapplication.DataBase.LocationDAO;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
@@ -54,6 +55,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     private Button mRemoveBtn;
 
     private LocationDatabase database;
+    private Alarm alarm;
     //저장할 데이터
     private LocationData locationData=new LocationData();
     private String mLocation_name;
@@ -62,7 +64,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     public static final String EXTRA_KEY="KEY";
     private int item_id;
     private int position;
-    private AlarmManager alarmManager;
+
     //Day of week buttons
     ToggleButton tSun;
     ToggleButton tMon;
@@ -95,6 +97,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
         //저장db가져오기
         database=LocationDatabase.getDataBase(this);
+        alarm=new Alarm();
 
         //places api 클라이언트
         mGeoDataClient= Places.getGeoDataClient(this,null);
@@ -105,18 +108,17 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         item_id=getIntent().getIntExtra(EXTRA_DATA_ID,0);
 
         if(item_id!=0){
-            LocationData existData=database.getLocationDAO().getData(item_id);
+           locationData=database.getLocationDAO().getData(item_id);
 
-            int dayofWeek=existData.getMDay_of_week();
+            int dayofWeek=locationData.getMDay_of_week();
 
-            mPlaceDetailsText.setText(existData.getMLocation_name());
-            mStartTime.setText(existData.getMTime());
+            mPlaceDetailsText.setText(locationData.getMLocation_name());
+            mStartTime.setText(locationData.getMTime());
             //요일도 가져오기
             checkDayOfWeek(dayofWeek);
             //저장을 수정버튼으로 바꾸고 db update
             mSaveBtn.setText("수정");
             mRemoveBtn.setEnabled(true);
-
         }
     }
 
@@ -157,21 +159,20 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                     Toast.makeText(this, "설정을 마무리해주세요", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                //DB에 저장
                 locationData.setMAlarmCheck(true);
 
                 LocationDAO locationDAO=database.getLocationDAO();
 
                 if(mSaveBtn.getText()=="수정"){
 
-                    LocationData updateData=locationDAO.getData(item_id);
-                    locationDAO.update(updateData);
+                    locationDAO.update(locationData);
                 }
                 else {
                     locationDAO.insert(locationData);
                 }
-                //알람매니저로 알람 등록
-                setAlarm();
+
+                //알람매니저 등록
+                alarm.setAlarm(this,locationData);
 
                 setResult(RESULT_OK);
                 finish();
@@ -181,12 +182,11 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 startActivityForResult(radiusIntent,0);
 
                 break;
-
             case R.id.removeBtn:
                 LocationData removeData=database.getLocationDAO().getLocation().get(position);
                 database.getLocationDAO().delete(removeData);//db항목 삭제
                 //알람 지우기---오류
-                //removeAlarm(item_id);
+                alarm.removeAlarm(this,removeData);
 
                 setResult(RESULT_OK);
                 finish();
@@ -195,51 +195,6 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 Intent listIntent=new Intent(this,LifeRadiusActivity.class);
                 startActivityForResult(listIntent,0);
         }
-    }
-
-    private void removeAlarm(int alarm_ID){
-
-        Intent receiverIntent=new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent=PendingIntent.getBroadcast(this, alarm_ID,receiverIntent,0);
-        alarmManager.cancel(pendingIntent);
-    }
-
-    private void setAlarm(){
-        String mTime=locationData.getMTime();
-
-        int mHour, mMin;
-        int mAlarmId=locationData.getMId();
-        //시간 받아오기
-        String[] time=mTime.split(":");
-        mHour=Integer.parseInt(time[0].trim());
-        mMin=Integer.parseInt(time[1].trim());
-
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.set(calendar.HOUR_OF_DAY,mHour);//1시간 전에 설정하기
-        calendar.set(calendar.MINUTE,mMin);
-
-        //요일 받아오기
-        int mDayOfWeek=locationData.getMDay_of_week();
-
-        getDayOfWeek(mDayOfWeek,calendar);
-        Log.d("캘린더",""+calendar.toString());
-        long currentTime=System.currentTimeMillis();
-        long setTime=calendar.getTimeInMillis();
-        //하루 시간
-        long oneDay=1000*60*60*24;
-        //지난 알림 다음날 울리기
-        while(currentTime>setTime){
-            setTime +=oneDay;
-        }
-
-        Intent receiverIntent=new Intent(this,AlarmReceiver.class);
-        //알람매니저 등록
-        alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
-        //알람 설정 시각에 발생하는 인텐트
-        PendingIntent alarmIntent= PendingIntent.getBroadcast(this,mAlarmId,receiverIntent,0);
-        //알람 설정
-        alarmManager.set(AlarmManager.RTC_WAKEUP,setTime,alarmIntent);
     }
 
     private void InitView(){
@@ -315,49 +270,6 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
             mDayOfWeek |=(1<<day);
         else
             mDayOfWeek &=~(1<<day);
-    }
-
-    private void getDayOfWeek(int dayOfWeek,Calendar calendar){
-        for(int day=0; day<7; day++) {
-            switch (day) {
-                case 0:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
-                    }
-                    break;
-                case 1:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-                    }
-                    break;
-                case 2:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.TUESDAY);
-                    }
-                    break;
-                case 3:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.WEDNESDAY);
-                    }
-                    break;
-                case 4:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.THURSDAY);
-                    }
-                    break;
-                case 5:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
-                    }
-                    break;
-                case 6:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
-                    }
-                    break;
-            }
-        }
-
     }
 
     private void checkDayOfWeek(int dayOfWeek) {

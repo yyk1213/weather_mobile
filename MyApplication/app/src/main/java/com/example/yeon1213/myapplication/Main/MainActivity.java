@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.yeon1213.myapplication.Alarm.Alarm;
 import com.example.yeon1213.myapplication.Alarm.AlarmReceiver;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity{
     private WeatherData main_weatherData;
 
     private LocationDatabase database;
-
+    private Alarm alarm;
     //좀 더 함수로 나누기
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity{
 
         initView();
         main_weatherData = new WeatherData();
-
+        alarm=new Alarm();
         location_check();
 //        Intent i= PersonalLocationService.newIntent(this);
 //        startService(i);
@@ -108,102 +109,24 @@ public class MainActivity extends AppCompatActivity{
 //            e.printStackTrace();
 //            Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
 //        }
-
-        setAlarm();
+        //알람이 등록돼있으면 따로 할 필요 없음
+        //setAllAlarm();
     }
 
-    private void setAlarm(){
+    private void setAllAlarm(){
 
         database=LocationDatabase.getDataBase(this);
 
         int databaseSize=database.getLocationDAO().getLocation().size();
 
         for(int i=0; i<databaseSize; i++){
-
-            LocationData locationData=database.getLocationDAO().getLocation().get(i);
-            String mTime=locationData.getMTime();
-
-            int mHour, mMin;
-            int mAlarmId=locationData.getMId();
-            //시간 받아오기
-            String[] time=mTime.split(":");
-            mHour=Integer.parseInt(time[0].trim());
-            mMin=Integer.parseInt(time[1].trim());
-
-            Log.d("시간알기", ""+mHour+":"+mMin);
-
-            Calendar calendar=Calendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.set(calendar.HOUR_OF_DAY,mHour);//1시간 전에 설정하기
-            calendar.set(calendar.MINUTE,mMin);
-
-            //요일 받아오기
-//            int mDayOfWeek=locationData.getMDay_of_week();
-//            getDayOfWeek(mDayOfWeek,calendar);
-
-            Log.d("캘린더",""+calendar.toString());
-            long currentTime=System.currentTimeMillis();
-            long setTime=calendar.getTimeInMillis();
-            //하루 시간
-            long oneDay=1000*60*60*24;
-            //지난 알림 다음날 울리기
-            while(currentTime>setTime){
-                setTime +=oneDay;
-            }
-
-            Intent receiverIntent=new Intent(this,AlarmReceiver.class);
-            receiverIntent.putExtra(AlarmReceiver.EXTRA_ALARM_ID,mAlarmId);
-
-            //알람매니저 등록
-            AlarmManager alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
-            //알람 설정 시각에 발생하는 인텐트
-            PendingIntent alarmIntent= PendingIntent.getBroadcast(this,mAlarmId,receiverIntent,0);
-            //알람 설정
-            alarmManager.set(AlarmManager.RTC_WAKEUP,setTime,alarmIntent);
+            alarm.setAlarm(this,database.getLocationDAO().getLocation().get(i));
         }
     }
 
-    private void getDayOfWeek(int dayOfWeek,Calendar calendar){
-
-        for(int day=0; day<7; day++) {
-            switch (day) {
-                case 0:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
-                    }
-                    break;
-                case 1:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-                    }
-                    break;
-                case 2:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.TUESDAY);
-                    }
-                    break;
-                case 3:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.WEDNESDAY);
-                    }
-                    break;
-                case 4:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.THURSDAY);
-                    }
-                    break;
-                case 5:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
-                    }
-                    break;
-                case 6:
-                    if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
-                    }
-                    break;
-            }
-        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
