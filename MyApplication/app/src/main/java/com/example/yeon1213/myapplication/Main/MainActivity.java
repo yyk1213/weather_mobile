@@ -1,17 +1,11 @@
 package com.example.yeon1213.myapplication.Main;
 
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -22,14 +16,12 @@ import android.widget.TextView;
 import com.example.yeon1213.myapplication.Alarm.AlarmReceiver;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
-import com.example.yeon1213.myapplication.Life_Radius.SettingLifeRadiusActivity;
-import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
 import com.example.yeon1213.myapplication.Life_Radius.LifeRadiusActivity;
 import com.example.yeon1213.myapplication.Living_Weather.LivingWeather;
+import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
 
-import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,9 +64,9 @@ public class MainActivity extends AppCompatActivity{
             public void onWeatherResponseAvailable() {
                 temperature.setText(main_weatherData.getTemperature());
                 fine_dust.setText(main_weatherData.getDust());
-                precipitation.setText("강수량: " + main_weatherData.getPrecipitation());
-                humidity.setText("습도: " + main_weatherData.getHumidity());
-                wind.setText("풍량: " + main_weatherData.getWind());
+                precipitation.setText(main_weatherData.getPrecipitation());
+                humidity.setText(main_weatherData.getHumidity());
+                wind.setText(main_weatherData.getWind());
             }
 
             @Override
@@ -92,7 +84,7 @@ public class MainActivity extends AppCompatActivity{
         main_RecyclerView = findViewById(R.id.main_recycler_view);
         main_RecyclerView.setHasFixedSize(true);
 
-        main_LayoutManager = new GridLayoutManager(getApplicationContext(), 3);
+        main_LayoutManager = new LinearLayoutManager(getApplicationContext());
         main_RecyclerView.setLayoutManager(main_LayoutManager);
 
         //날씨 값 가져오기

@@ -1,87 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    <ImageView
-        android:id="@+id/weather_image"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/preview"
-        android:layout_alignParentLeft="true"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:textColor="#000000"
+        android:textSize="25dp"
+        android:text="오늘의 날씨"/>
 
-        <TextView
-            android:id="@+id/temperature_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/weather_image"
-            android:text="온도:" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp">
 
-        <TextView
-            android:id="@+id/temperature"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/weather_image"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/temperature_text"
-            android:text=""/>
-
-        <TextView
-            android:id="@+id/fine_dust_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/temperature"
-            android:layout_marginTop="0dp"
-            android:layout_toRightOf="@id/weather_image"
-            android:text="미세먼지:"/>
-
-        <TextView
-            android:id="@+id/fine_dust"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/temperature"
-            android:layout_marginTop="0dp"
-            android:layout_toRightOf="@id/fine_dust_text"
-            android:text=""/>
-    </RelativeLayout>
+            android:layout_weight="1.0"
+            android:src="@drawable/preview" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_weight="1.0"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/precipitation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="강수량"
-            android:layout_weight="1"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="습도"
-            android:layout_weight="1"/>
+                <TextView
+                    android:id="@+id/temperature_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="6dp"
+                    android:text="온도 : "
+                    android:textColor="#000000"
+                    android:textSize="14dp" />
 
-        <TextView
-            android:id="@+id/wind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="바람"
-            android:layout_weight="1"/>
+                <TextView
+                    android:id="@+id/temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#1100ff"
+                    android:textSize="16dp" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/fine_dust_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="6dp"
+                    android:text="미세먼지 :"
+                    android:textColor="#000000"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/fine_dust"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/temperature"
+                    android:text=""
+                    android:textColor="#1100ff"
+                    android:textSize="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/precipitation_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="강수량 :"
+                    android:textColor="#000000"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/precipitation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/temperature"
+                    android:text=""
+                    android:textColor="#1100ff"
+                    android:textSize="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/humidity_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="습도 :"
+                    android:textColor="#000000"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/humidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/temperature"
+                    android:text=""
+                    android:textColor="#1100ff"
+                    android:textSize="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/wind_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="바람 :"
+                    android:textColor="#000000"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/temperature"
+                    android:text=""
+                    android:textColor="#1100ff"
+                    android:textSize="16dp" />
+
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
-    <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-        android:text="내가 선택한 지수 보기"
-        android:textStyle="bold"
-        android:textAlignment="center"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:background="#EDF0F4" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="내가 선택한 지수 보기"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="15dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ico_dropdown" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="10dp"
+        android:background="#D0D5D9" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/main_recycler_view"
