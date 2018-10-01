@@ -39,7 +39,7 @@ public class livingAdapter extends RecyclerView.Adapter<livingAdapter.living_Vie
     public void onBindViewHolder(living_ViewHolder living_viewHolder, int position) {
         Living_data LD=living_Dataset.get(position);
         living_viewHolder.living_name.setText(LD.getLiving_name());
-        living_viewHolder.living_expla.setText(LD.getLiving_explanation());
+        living_viewHolder.living_expla.setText("- " + LD.getLiving_explanation());
     }
 
     @Override

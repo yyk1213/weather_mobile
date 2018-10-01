@@ -161,7 +161,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             LocationData radius=mRadius.get(position);
             holder.mLocationNameTextView.setText(radius.getMLocation_name());
             holder.mTimeTextView.setText(radius.getMTime());
-            holder.mDayOfWeekTextView.setText(getDayOfWeek(radius.getMDay_of_week()));
+            holder.mDayOfWeekTextView.setText(getDayOfWeek(radius.getMDay_of_week()) + "요일");
             holder.mAlarmSwitch.setChecked(radius.getMAlarmCheck());
 
             Log.d("요일",""+getDayOfWeek(radius.getMDay_of_week()));

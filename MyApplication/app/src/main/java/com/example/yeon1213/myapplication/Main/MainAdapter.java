@@ -3,6 +3,7 @@ package com.example.yeon1213.myapplication.Main;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.yeon1213.myapplication.R;
@@ -16,9 +17,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
 
         public TextView index;
-        public MyViewHolder(TextView v){
+        public MyViewHolder(LinearLayout v){
             super(v);
-            index =v.findViewById(R.id.living_text);
+            index = v.findViewById(R.id.living_text);
         }
     }
 
@@ -28,7 +29,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        TextView v = (TextView)LayoutInflater.from(parent.getContext()).inflate(R.layout.main_data_row, parent, false);
+        LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.main_data_row, parent, false);
 
         MyViewHolder vh = new MyViewHolder(v);
         return vh;
