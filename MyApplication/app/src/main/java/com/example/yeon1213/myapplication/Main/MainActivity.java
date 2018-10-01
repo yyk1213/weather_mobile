@@ -187,4 +187,10 @@ public class MainActivity extends AppCompatActivity{
             longitude=127.1234;
 //        }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
+    }
 }

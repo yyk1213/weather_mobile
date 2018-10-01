@@ -20,13 +20,15 @@ import com.example.yeon1213.myapplication.Main.Weather.Weather;
 import com.example.yeon1213.myapplication.Main.WeatherData;
 import com.example.yeon1213.myapplication.R;
 
-public class AlarmReceiver extends BroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver implements ResponseListener{
 
     private static final String TAG="AlarmReceiver";
     private LocationDatabase locationDatabase;
     public static final String EXTRA_ALARM_ID="com.example.yeon1213.myapplication.Alarm.alarm_id";
-    private WeatherData weather_data;
+    private WeatherData receiver_weather_data;
     private String location_weather="";
+    private NotificationManager notificationManager;
+    private Notification notification;
 
     public static Intent newIntent(Context context, int id){
         Intent receiverIntent=new Intent(context,BroadcastReceiver.class);
@@ -35,19 +37,34 @@ public class AlarmReceiver extends BroadcastReceiver {
         return receiverIntent;
     }
 
-    //데이터 가져오면 값 넣기
-    ResponseListener responseListener=new ResponseListener() {
-        @Override
-        public void onWeatherResponseAvailable() {
-            location_weather +="온도: "+weather_data.getTemperature()+" ";
-            location_weather +="강수량: "+weather_data.getPrecipitation()+" ";
-        }
+//    //데이터 가져오면 값 넣기
+//    ResponseListener responseListener=new ResponseListener() {
+//        @Override
+//        public void onWeatherResponseAvailable() {
+//            location_weather +="온도: "+weather_data.getTemperature()+" ";
+//            location_weather +="강수량: "+weather_data.getPrecipitation()+" ";
+//
+//        }
+//
+//        @Override
+//        public void onIndexResponseAvailable() {
+//
+//        }
+//    };
 
-        @Override
-        public void onIndexResponseAvailable() {
+    @Override
+    public void onWeatherResponseAvailable() {
+        location_weather +="온도:"+receiver_weather_data.getTemperature()+" ";
+        location_weather +="강수량:"+receiver_weather_data.getPrecipitation()+" ";
 
-        }
-    };
+        notificationManager.notify(1, notification);
+        Log.d("노티 내용",""+location_weather);
+    }
+
+    @Override
+    public void onIndexResponseAvailable() {
+
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -56,26 +73,24 @@ public class AlarmReceiver extends BroadcastReceiver {
         int id=intent.getIntExtra(EXTRA_ALARM_ID,0);
 
         Log.e("리시버 id 값", ""+id);
-        weather_data=new WeatherData();
+        receiver_weather_data=new WeatherData();
 
         LocationData locationData=locationDatabase.getLocationDAO().getData(id);
 
-        weather_data.setmListener(responseListener);
-        weather_data.getData(locationData.getMLatitude(),locationData.getMLongitude());
+        receiver_weather_data.setmListener(this);
+        receiver_weather_data.getData(locationData.getMLatitude(),locationData.getMLongitude());
 
         String location_name=locationData.getMLocation_name();
 
-        NotificationManager notificationManager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         PendingIntent pendingIntent=PendingIntent.getActivity(context,0,new Intent(context, MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = new NotificationCompat.Builder(context)
+        notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(location_name)
                 .setContentText(location_weather)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build();
-
-        notificationManager.notify(1, notification);
     }
 }

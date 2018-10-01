@@ -77,7 +77,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
     private class RadiusHolder extends RecyclerView.ViewHolder implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener{
 
-        public TextView mLocationTextView;
+        public TextView mLocationNameTextView;
         public TextView mTimeTextView;
         public TextView mDayOfWeekTextView;
         public SwitchCompat mAlarmSwitch;
@@ -86,7 +86,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         public RadiusHolder(View itemView) {
             super(itemView);
 
-            mLocationTextView=itemView.findViewById(R.id.radius_location);
+            mLocationNameTextView =itemView.findViewById(R.id.radius_location);
             mTimeTextView=itemView.findViewById(R.id.radius_time);
             mDayOfWeekTextView=itemView.findViewById(R.id.radius_day_of_week);
             mAlarmSwitch =itemView.findViewById(R.id.radius_check);
@@ -116,8 +116,6 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
                 itemView.setEnabled(false);
             }
         }
-
-
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -161,7 +159,7 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             holder.mView.setTag(position);
 
             LocationData radius=mRadius.get(position);
-            holder.mLocationTextView.setText(radius.getMLocation_name());
+            holder.mLocationNameTextView.setText(radius.getMLocation_name());
             holder.mTimeTextView.setText(radius.getMTime());
             holder.mDayOfWeekTextView.setText(getDayOfWeek(radius.getMDay_of_week()));
             holder.mAlarmSwitch.setChecked(radius.getMAlarmCheck());

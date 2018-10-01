@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
+import android.support.v4.text.util.LinkifyCompat;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,11 @@ public class LocationData {
     @ColumnInfo(name = "mLocation_name")
     @NonNull
     private String mLocation_name;
+
+    @ColumnInfo(name="mLocation_address")
+    @NonNull
+    private String mLocation_address;
+
     @NonNull
     @ColumnInfo(name = "mTime")
     private String mTime;
@@ -96,5 +102,14 @@ public class LocationData {
 
     public void setMDay_of_week(@NonNull int mDay_of_week) {
         this.mDay_of_week = mDay_of_week;
+    }
+
+    @NonNull
+    public String getMLocation_address() {
+        return mLocation_address;
+    }
+
+    public void setMLocation_address(@NonNull String mLocation_address) {
+        this.mLocation_address = mLocation_address;
     }
 }

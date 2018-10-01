@@ -33,11 +33,6 @@ public class WeatherData{
     private Weather weatherData; //날씨 데이터 넣는 것
     private List<String> livingData=new ArrayList<>();//리사이클러뷰에 담는 생활기상지수
     private ResponseListener mListener;//응답 값이 왔는지 확인하는 리스너
-    //위치 데이터
-    private String address;
-    private String sido;
-    private String sigugun;;
-    private String dongmyun;
     //날씨 데이터
     private String temperature;
     private String precipitation;
@@ -89,18 +84,6 @@ public class WeatherData{
         return dust;
     }
 
-    public String getSido() {
-        return sido;
-    }
-
-    public String getSigugun() {
-        return sigugun;
-    }
-
-    public String getDongmyun() {
-        return dongmyun;
-    }
-
     public void getData(double latitude, double longitude) {
 
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
@@ -131,6 +114,7 @@ public class WeatherData{
             @Override
             public void onFailure(Call<Data> call, Throwable t) {
                 //프로그래스바 날씨 데이터를 받아오고 있습니다 띄우기
+                Log.e("fail",""+t.toString());
             }
         });
         //열지수
@@ -150,7 +134,7 @@ public class WeatherData{
 
             @Override
             public void onFailure(Call<Data> call_heat, Throwable t) {
-
+                Log.e("fail",""+t.toString());
             }
         });
 
@@ -211,7 +195,7 @@ public class WeatherData{
 
             @Override
             public void onFailure(Call<Data> call_carwash, Throwable t) {
-
+                Log.e("fail",""+t.toString());
             }
         });
 

@@ -1,7 +1,5 @@
 package com.example.yeon1213.myapplication.Life_Radius;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +20,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.yeon1213.myapplication.Alarm.Alarm;
-import com.example.yeon1213.myapplication.Alarm.AlarmReceiver;
 import com.example.yeon1213.myapplication.DataBase.LocationDAO;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
@@ -39,14 +36,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class SettingLifeRadiusActivity extends AppCompatActivity implements View.OnClickListener,ToggleButton.OnCheckedChangeListener{
 
     protected GeoDataClient mGeoDataClient;
     private AutoCompleteTextView mSearchPlace;
     private PlaceAutocompleteAdapter mAdapter;
-    private TextView mPlaceDetailsAttribution;
+    private TextView mPlaceDetailsAddress;
     private TextView mPlaceDetailsText;
     private TextView mStartTime;
     private Button mTimeBtn;
@@ -58,10 +54,10 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     private Alarm alarm;
     //저장할 데이터
     private LocationData locationData=new LocationData();
-    private String mLocation_name;
+    private String data_Location_name;
+    private String data_Location_address;
     private int mDayOfWeek =0;
 
-    public static final String EXTRA_KEY="KEY";
     private int item_id;
     private int position;
 
@@ -114,6 +110,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
             mPlaceDetailsText.setText(locationData.getMLocation_name());
             mStartTime.setText(locationData.getMTime());
+            mPlaceDetailsAddress.setText(locationData.getMLocation_address());
             //요일도 가져오기
             checkDayOfWeek(dayofWeek);
             //저장을 수정버튼으로 바꾸고 db update
@@ -200,8 +197,8 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     private void InitView(){
 
         mSearchPlace =findViewById(R.id.place_autocomplete_powered_by_google);
-        mPlaceDetailsText=findViewById(R.id.place_address);
-        mPlaceDetailsAttribution = findViewById(R.id.place_attribution);
+        mPlaceDetailsText=findViewById(R.id.place_name);
+        mPlaceDetailsAddress = findViewById(R.id.place_attribution);
         mClearBtn=findViewById(R.id.clear_btn);
         mTimeBtn=findViewById(R.id.timeBtn);
         mStartTime=findViewById(R.id.start_time);
@@ -347,26 +344,29 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 locationData.setMLatitude(latLng.latitude);
                 locationData.setMLongitude(latLng.longitude);
 
-                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),place.getAddress()));
-                mLocation_name=formatPlaceDetails(getResources(), place.getName(),place.getAddress()).toString();
-                //장소 저장
-                locationData.setMLocation_name(mLocation_name);
+                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName()));
+                mPlaceDetailsAddress.setText(formatPlaceDetails(getResources(),place.getAddress()));
 
-                Log.d("결과",""+formatPlaceDetails(getResources(), place.getName(),place.getAddress()));
+                data_Location_name =formatPlaceDetails(getResources(), place.getName()).toString();
+                data_Location_address=formatPlaceDetails(getResources(),place.getAddress()).toString();
+
+                //장소 저장
+                locationData.setMLocation_name(data_Location_name);
+                locationData.setMLocation_address(data_Location_address);
 
                 // Display the third party attributions if set.
-                final CharSequence thirdPartyAttribution = places.getAttributions();
-                if (thirdPartyAttribution == null) {
-                    mPlaceDetailsAttribution.setVisibility(View.GONE);
-                } else {
-                    mPlaceDetailsAttribution.setVisibility(View.VISIBLE);
-                    mPlaceDetailsAttribution.setText(
-                            Html.fromHtml(thirdPartyAttribution.toString()));
-                }
+//                final CharSequence thirdPartyAttribution = places.getAttributions();
+//                if (thirdPartyAttribution == null) {
+//                    mPlaceDetailsAddress.setVisibility(View.GONE);
+//                } else {
+//                    mPlaceDetailsAddress.setVisibility(View.VISIBLE);
+//                    mPlaceDetailsAddress.setText(
+//                            Html.fromHtml(thirdPartyAttribution.toString()));
+//                }
 
                 Log.i("TAG", "Place details received: " + place.getName());
-
                 places.release();
+
             } catch (RuntimeRemoteException e) {
                 // Request did not complete successfully
                 Log.e("오류", "Place query did not complete.", e);
@@ -375,9 +375,9 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         }
     };
 
-    private static Spanned formatPlaceDetails(Resources res,CharSequence name, CharSequence address) {
+    private static Spanned formatPlaceDetails(Resources res,CharSequence name) {
 
-        return Html.fromHtml(res.getString(R.string.place_details,name,address));
+        return Html.fromHtml(res.getString(R.string.place_details,name));
     }
 
 }
