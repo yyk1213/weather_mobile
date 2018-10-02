@@ -100,11 +100,11 @@ public class WeatherData{
 
                     Log.d("Hourly DATA 결과", "" + weatherData.getHourly().get(temp).getGrid().getVillage());
                     if (weatherData != null) {
-                        temperature=weatherData.getHourly().get(temp).getTemperature().getTc();
-                        Log.d("함수 온도",""+temperature);
-                        precipitation=weatherData.getHourly().get(temp).getPrecipitation().getSinceOntime();
-                        humidity=weatherData.getHourly().get(temp).getHumidity();
-                        wind=weatherData.getHourly().get(temp).getWind().getWdir();
+                        temperature = weatherData.getHourly().get(temp).getTemperature().getTc();
+                        Log.d("함수 온도", "" + temperature);
+                        precipitation = weatherData.getHourly().get(temp).getPrecipitation().getSinceOntime();
+                        humidity = weatherData.getHourly().get(temp).getHumidity();
+                        wind = weatherData.getHourly().get(temp).getWind().getWdir();
 
                         mListener.onWeatherResponseAvailable();
                     }
@@ -114,7 +114,7 @@ public class WeatherData{
             @Override
             public void onFailure(Call<Data> call, Throwable t) {
                 //프로그래스바 날씨 데이터를 받아오고 있습니다 띄우기
-                Log.e("fail",""+t.toString());
+                Log.e("fail", "" + t.toString());
             }
         });
         //열지수
@@ -124,17 +124,17 @@ public class WeatherData{
             public void onResponse(Call<Data> call_heat, Response<Data> response) {
                 if (response.isSuccessful()) {
                     heatIndex = response.body().getWeather().getWIndex().getHeatIndex().get(0).getCurrent().getIndex();
-                    Log.d("열지수",""+ heatIndex);
+                    Log.d("열지수", "" + heatIndex);
                     if (heatIndex != null) {
-                        livingData.add("열지수: "+heatIndex);
-                         mListener.onIndexResponseAvailable();
+                        livingData.add("열지수: " + heatIndex);
+                        mListener.onIndexResponseAvailable();
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<Data> call_heat, Throwable t) {
-                Log.e("fail",""+t.toString());
+                Log.e("fail", "" + t.toString());
             }
         });
 
@@ -144,9 +144,9 @@ public class WeatherData{
             public void onResponse(Call<Data> call_wct, Response<Data> response) {
                 if (response.isSuccessful()) {
                     wctIndex = response.body().getWeather().getWIndex().getWctIndex().get(0).getCurrent().getIndex();
-                    Log.d("wctIndex",""+ wctIndex);
+                    Log.d("wctIndex", "" + wctIndex);
                     if (wctIndex != null) {
-                        livingData.add("체감온도: "+wctIndex);
+                        livingData.add("체감온도: " + wctIndex);
                         mListener.onIndexResponseAvailable();
                     }
                 }
@@ -164,9 +164,9 @@ public class WeatherData{
             public void onResponse(Call<Data> call_thIndex, Response<Data> response) {
                 if (response.isSuccessful()) {
                     thIndex = response.body().getWeather().getWIndex().getThIndex().get(0).getCurrent().getIndex();
-                    Log.d("thIndex",""+ thIndex);
+                    Log.d("thIndex", "" + thIndex);
                     if (thIndex != null) {
-                        livingData.add("불쾌지수: "+thIndex);
+                        livingData.add("불쾌지수: " + thIndex);
                         mListener.onIndexResponseAvailable();
                     }
                 }
@@ -185,9 +185,9 @@ public class WeatherData{
 
                 if (response.isSuccessful()) {
                     carWash = response.body().getWeather().getWIndex().getCarWash().get(0).getComment();
-                    Log.d("세차지수",""+ carWash);
+                    Log.d("세차지수", "" + carWash);
                     if (carWash != null) {
-                        livingData.add("세차지수:"+carWash);
+                        livingData.add("세차지수:" + carWash);
                         mListener.onIndexResponseAvailable();
                     }
                 }
@@ -195,7 +195,7 @@ public class WeatherData{
 
             @Override
             public void onFailure(Call<Data> call_carwash, Throwable t) {
-                Log.e("fail",""+t.toString());
+                Log.e("fail", "" + t.toString());
             }
         });
 
@@ -205,9 +205,9 @@ public class WeatherData{
 //            public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
 //                if (response.isSuccessful()) {
 //                    uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
-//                    Log.d("uvIndex",""+ uvIndex);
+//                    Log.d("uvIndex", "" + uvIndex);
 //                    if (uvIndex != null) {
-//                        livingData.add("자외선지수: "+uvIndex);
+//                        livingData.add("자외선지수: " + uvIndex);
 //                        mListener.onIndexResponseAvailable();
 //                    }
 //                }
@@ -225,12 +225,12 @@ public class WeatherData{
 //            public void onResponse(Call<Data> call_Laundry, Response<Data> response) {
 //
 //                if (response.isSuccessful()) {
-//                    Log.d("데이터 성공?","");
+//                    Log.d("데이터 성공?", "");
 //                    //시간별 데이터를 받음
 //                    laundry = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay01().getComment();
-//                    Log.d("laundry",""+ laundry);
+//                    Log.d("laundry", "" + laundry);
 //                    if (laundry != null) {
-//                        livingData.add("빨래지수"+laundry);
+//                        livingData.add("빨래지수" + laundry);
 //                        mListener.onIndexResponseAvailable();
 //                    }
 //                }
@@ -241,7 +241,7 @@ public class WeatherData{
 //
 //            }
 //        });
-
+//
 //        //통신 가로채서 값 보여주는 것
 //        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
 //        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -251,11 +251,11 @@ public class WeatherData{
 //        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
 //        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
 //
-//        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY,10,10,1,1,"강남구","DAILY",1.3,"json");
+//        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY, 10, 10, 1, 1, "강남구", "DAILY", 1.3, "json");
 //        call_dust.enqueue(new Callback<FineDust>() {
 //            @Override
 //            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
-//                Log.d("미세먼지","응답");
+//                Log.d("미세먼지", "응답");
 //                if (response.isSuccessful()) {
 //                    //통합대기환경지수
 //                    dust = response.body().getList().get(0).getKhaiGrade();
@@ -263,65 +263,13 @@ public class WeatherData{
 //                    mListener.onIndexResponseAvailable();
 //                }
 //            }
+//
 //            @Override
 //            public void onFailure(Call<FineDust> call_dust, Throwable t) {
-//                Log.e("미세먼지 에러",""+t.toString());
+//                Log.e("미세먼지 에러", "" + t.toString());
 //            }
 //        });
-
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//
-//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-//
-//        Gson gson=new GsonBuilder().registerTypeAdapterFactory(new DataTypeAdapterFactory()).create();
-//
-//        Retrofit geo_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create(gson)).baseUrl(ApiService.GEO_BASEURL).build();
-//        ApiService geo_apiService = geo_retrofit.create(ApiService.class);
-//
-//        Call<ResponseBody> call_GeoCode = geo_apiService.getGeoCode(ApiService.GEO_CLIENTID,ApiService.GEO_SECRETKEY,Double.toString(latitude)+","+Double.toString(longitude));
-//        call_GeoCode.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                JsonObject jsonObject=new JsonObject().get(response.body().toString()).getAsJsonObject();
-//                if(jsonObject.get("result").getAsString().contains("items")){
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//
-//            }
-//        });
-//
 //    }
-//
-//    class DataTypeAdapterFactory implements TypeAdapterFactory{
-//        @Override
-//        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-//
-//            final TypeAdapter<T> delegate=gson.getDelegateAdapter(this,type);
-//            final TypeAdapter<JsonElement> elementAdapter=gson.getAdapter(JsonElement.class);
-//
-//            return new TypeAdapter<T>(){
-//                @Override
-//                public void write(JsonWriter out, T value) throws IOException {
-//                    delegate.write(out,value);
-//                }
-//
-//                @Override
-//                public T read(JsonReader in) throws IOException {
-//                    JsonElement jsonElement=elementAdapter.read(in);
-//                    if(jsonElement.isJsonObject()){
-//                        JsonObject jsonObject=jsonElement.getAsJsonObject();
-//                        if(jsonObject.has("address")){
-//                            jsonElement=jsonObject.get("address");
-//                        }
-//                    }
-//                    return delegate.fromJsonTree(jsonElement);
-//                }
-//            }.nullSafe();
-//        }
     }
 }
+

@@ -1,7 +1,5 @@
 package com.example.yeon1213.myapplication.Main;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +12,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.yeon1213.myapplication.Alarm.Alarm;
-import com.example.yeon1213.myapplication.Alarm.AlarmReceiver;
-import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
 import com.example.yeon1213.myapplication.Health_Weather.HealthWeather;
 import com.example.yeon1213.myapplication.Life_Radius.LifeRadiusActivity;
@@ -24,8 +20,6 @@ import com.example.yeon1213.myapplication.R;
 import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
@@ -102,18 +96,6 @@ public class MainActivity extends AppCompatActivity{
 //            Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
 //        }
         //알람이 등록돼있으면 따로 할 필요 없음
-        //setAllAlarm();
-    }
-
-    private void setAllAlarm(){
-
-        database=LocationDatabase.getDataBase(this);
-
-        int databaseSize=database.getLocationDAO().getLocation().size();
-
-        for(int i=0; i<databaseSize; i++){
-            alarm.setAlarm(this,database.getLocationDAO().getLocation().get(i));
-        }
     }
 
     @Override
@@ -159,6 +141,7 @@ public class MainActivity extends AppCompatActivity{
         wind = findViewById(R.id.wind);
     }
 
+    //현재위치 받아오기
     private void location_check(){
 
         database=LocationDatabase.getDataBase(this);
@@ -180,9 +163,9 @@ public class MainActivity extends AppCompatActivity{
 //        }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        this.finish();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        this.finish();
+//    }
 }

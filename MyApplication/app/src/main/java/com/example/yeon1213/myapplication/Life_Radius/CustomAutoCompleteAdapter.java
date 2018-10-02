@@ -2,6 +2,7 @@ package com.example.yeon1213.myapplication.Life_Radius;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,9 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBufferResponse;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -29,20 +32,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePrediction> implements Filterable {
-
-    public static final String TAG = "PlaceAutoAdapter";
+public class CustomAutoCompleteAdapter extends ArrayAdapter implements Filterable{
+    public static final String TAG = "CustomAutoCompAdapter";
 
     private GeoDataClient mGeoDataClient;
     private AutocompleteFilter mPlaceFilter;
-    private ArrayList<AutocompletePrediction> mResultList;
+    private ArrayList<String> mResultList;
     private LatLngBounds mBounds;
 
-    public PlaceAutocompleteAdapter(@NonNull Context context, GeoDataClient mGeoDataClient, LatLngBounds bounds, AutocompleteFilter mPlaceFilter) {
+    public CustomAutoCompleteAdapter(@NonNull Context context,GeoDataClient mGeoDataClient, LatLngBounds mBounds,AutocompleteFilter mPlaceFilter) {
         super(context,android.R.layout.simple_expandable_list_item_2,android.R.id.text1);
         this.mGeoDataClient = mGeoDataClient;
         this.mPlaceFilter = mPlaceFilter;
-        this.mBounds=bounds;
+        this.mBounds = mBounds;
     }
 
     @Override
@@ -50,13 +52,15 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
         return mResultList.size();
     }
 
+    @Nullable
     @Override
-    public AutocompletePrediction getItem(int position) {
+    public String getItem(int position) {
         return mResultList.get(position);
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View view, @NonNull ViewGroup parent) {
+    public View getView(int position, @Nullable View view, @NonNull ViewGroup parent) {
 
         View row = super.getView(position, view, parent);
 
@@ -64,7 +68,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
         // Note that getPrimaryText() and getSecondaryText() return a CharSequence that may contain
         // styling based on the given CharacterStyle.
 
-        AutocompletePrediction item = getItem(position);
+        String item = getItem(position);
 
         TextView textView1 = row.findViewById(android.R.id.text1);
         TextView textView2 = row.findViewById(android.R.id.text2);
@@ -76,45 +80,34 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
     @Override
     public Filter getFilter() {
         return new Filter() {
-
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults results = new FilterResults();// 필터링 결과
-                // We need a separate list to store the results, since
-                // this is run asynchronously.
+                FilterResults results=new FilterResults();
 
-                ArrayList<AutocompletePrediction> filterData = new ArrayList<>();//결과 담는 리스트
+                ArrayList<AutocompletePrediction> resultList=new ArrayList<>();
+                ArrayList<String> filterData=new ArrayList<>();
 
-                // Skip the autocomplete query if no constraints are given.
-                if (constraint != null) {
-                    // Query the autocomplete API for the (constraint) search string.
-                    filterData = getAutocomplete(constraint);
+                if(constraint !=null){
+                    resultList=getAutocomplete(constraint);
                 }
 
-                results.values = filterData;
-
-                if (filterData != null) {
-                    results.count = filterData.size();
-                } else {
-                    results.count = 0;
+                results.values=resultList;
+                if(resultList!=null){
+                    results.count=0;
                 }
                 return results;
             }
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                if (results != null && results.count > 0) {
-                    // The API returned at least one result, update the data.
-                    //자동완성 객체 값으로 보여주기--여기를 수정해서 이름이랑 주소만 보여주게 하기
-                    mResultList = (ArrayList<AutocompletePrediction>) results.values;
-                    notifyDataSetChanged();
-                } else {
-                    // The API did not return any results, invalidate the data set.
+                if(results!=null && results.count>0){
+                    mResultList=(ArrayList<String>)results.values;
+                            notifyDataSetChanged();
+                }else{
                     notifyDataSetInvalidated();
                 }
             }
 
-            //결과 값을 String으로 바꿔서 textView에 보여주기
             @Override
             public CharSequence convertResultToString(Object resultValue) {
                 // Override this method to display a readable result in the AutocompleteTextView
@@ -127,6 +120,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
             }
         };
     }
+
     //자동완성
     private ArrayList<AutocompletePrediction> getAutocomplete(CharSequence constraint) {
         Log.i(TAG, "Starting autocomplete query for: " + constraint);

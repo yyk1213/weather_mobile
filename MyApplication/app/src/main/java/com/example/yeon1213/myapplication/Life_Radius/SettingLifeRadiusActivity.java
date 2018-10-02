@@ -4,10 +4,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,7 +26,9 @@ import com.example.yeon1213.myapplication.DataBase.LocationDAO;
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 import com.example.yeon1213.myapplication.DataBase.LocationDatabase;
 import com.example.yeon1213.myapplication.R;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.AutocompletePredictionBufferResponse;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
@@ -37,7 +41,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
 
-public class SettingLifeRadiusActivity extends AppCompatActivity implements View.OnClickListener,ToggleButton.OnCheckedChangeListener{
+public class SettingLifeRadiusActivity extends AppCompatActivity implements View.OnClickListener, ToggleButton.OnCheckedChangeListener {
 
     protected GeoDataClient mGeoDataClient;
     private AutoCompleteTextView mSearchPlace;
@@ -53,10 +57,10 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     private LocationDatabase database;
     private Alarm alarm;
     //저장할 데이터
-    private LocationData locationData=new LocationData();
+    private LocationData locationData = new LocationData();
     private String data_Location_name;
     private String data_Location_address;
-    private int mDayOfWeek =0;
+    private int mDayOfWeek = 0;
 
     private int item_id;
     private int position;
@@ -70,14 +74,14 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
     ToggleButton tFri;
     ToggleButton tSat;
 
-    private static final LatLngBounds BOUNDS_GRATER_KOREA=new LatLngBounds(new LatLng(35.9078, 127.7669),new LatLng(35.9078, 127.7669));
-    public static final String EXTRA_DATA_ID="com.example.yeon1213.myapplication.Life_Radius.location_data_id";
-    public static final String EXTRA_DATA_POSITION="com.example.yeon1213.myapplication.Life_Radius.location_data_position";
+    private static final LatLngBounds BOUNDS_GRATER_KOREA = new LatLngBounds(new LatLng(35.9078, 127.7669), new LatLng(35.9078, 127.7669));
+    public static final String EXTRA_DATA_ID = "com.example.yeon1213.myapplication.Life_Radius.location_data_id";
+    public static final String EXTRA_DATA_POSITION = "com.example.yeon1213.myapplication.Life_Radius.location_data_position";
 
-    public static Intent newIntent(Context context, int locationData_id,int data_position){
-        Intent dataIntent=new Intent(context, SettingLifeRadiusActivity.class);
+    public static Intent newIntent(Context context, int locationData_id, int data_position) {
+        Intent dataIntent = new Intent(context, SettingLifeRadiusActivity.class);
         dataIntent.putExtra(EXTRA_DATA_ID, locationData_id);
-        dataIntent.putExtra(EXTRA_DATA_POSITION,data_position);
+        dataIntent.putExtra(EXTRA_DATA_POSITION, data_position);
 
         return dataIntent;
     }
@@ -92,21 +96,21 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 //        Toast.makeText(getApplicationContext(),a,Toast.LENGTH_SHORT).show();
 
         //저장db가져오기
-        database=LocationDatabase.getDataBase(this);
-        alarm=new Alarm();
+        database = LocationDatabase.getDataBase(this);
+        alarm = new Alarm();
 
         //places api 클라이언트
-        mGeoDataClient= Places.getGeoDataClient(this,null);
+        mGeoDataClient = Places.getGeoDataClient(this, null);
 
         InitView();
 
-        position=getIntent().getIntExtra(EXTRA_DATA_POSITION,0);
-        item_id=getIntent().getIntExtra(EXTRA_DATA_ID,0);
+        position = getIntent().getIntExtra(EXTRA_DATA_POSITION, 0);
+        item_id = getIntent().getIntExtra(EXTRA_DATA_ID, 0);
 
-        if(item_id!=0){
-           locationData=database.getLocationDAO().getData(item_id);
+        if (item_id != 0) {
+            locationData = database.getLocationDAO().getData(item_id);
 
-            int dayofWeek=locationData.getMDay_of_week();
+            int dayofWeek = locationData.getMDay_of_week();
 
             mPlaceDetailsText.setText(locationData.getMLocation_name());
             mStartTime.setText(locationData.getMTime());
@@ -121,28 +125,28 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.timeBtn:
-                Calendar now=Calendar.getInstance();
-                int hour=now.get(Calendar.HOUR_OF_DAY);
-                int minute=now.get(Calendar.MINUTE);
-                boolean is24Hour=true;
+                Calendar now = Calendar.getInstance();
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                int minute = now.get(Calendar.MINUTE);
+                boolean is24Hour = true;
 
-                TimePickerDialog.OnTimeSetListener onTimeSetListener=new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         //시간 저장
-                        int hour=view.getCurrentHour();
+                        int hour = view.getCurrentHour();
                         //DB에 시간 저장
-                        locationData.setMTime(hour+":"+minute);
+                        locationData.setMTime(hour + ":" + minute);
 
-                        mStartTime.setText(hour+":"+minute);
-                        Log.d("시간",""+hour+" "+minute);
+                        mStartTime.setText(hour + ":" + minute);
+                        Log.d("시간", "" + hour + " " + minute);
                     }
                 };
 
-                TimePickerDialog timePickerDialog=new TimePickerDialog(SettingLifeRadiusActivity.this,onTimeSetListener,hour,minute,is24Hour);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(SettingLifeRadiusActivity.this, onTimeSetListener, hour, minute, is24Hour);
                 timePickerDialog.show();
                 break;
 
@@ -152,58 +156,57 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
             case R.id.saveBtn:
                 //설정이 완료되지 않은 경우
-                if(locationData.getMTime()==null || locationData.getMLocation_name()==null || locationData.getMDay_of_week()==0) {
+                if (locationData.getMTime() == null || locationData.getMLocation_name() == null || locationData.getMDay_of_week() == 0) {
                     Toast.makeText(this, "설정을 마무리해주세요", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 locationData.setMAlarmCheck(true);
 
-                LocationDAO locationDAO=database.getLocationDAO();
+                LocationDAO locationDAO = database.getLocationDAO();
 
-                if(mSaveBtn.getText()=="수정"){
+                if (mSaveBtn.getText() == "수정") {
 
                     locationDAO.update(locationData);
-                }
-                else {
+                } else {
                     locationDAO.insert(locationData);
                 }
 
                 //알람매니저 등록
-                alarm.setAlarm(this,locationData);
+                alarm.setAlarm(this, locationData);
 
                 setResult(RESULT_OK);
                 finish();
 
-                //알람 리스트 화면으로 돌아가기
-                Intent radiusIntent=new Intent(this,LifeRadiusActivity.class);
-                startActivityForResult(radiusIntent,0);
+//                //알람 리스트 화면으로 돌아가기
+//                Intent radiusIntent=new Intent(this,LifeRadiusActivity.class);
+//                startActivityForResult(radiusIntent,0);
 
                 break;
             case R.id.removeBtn:
-                LocationData removeData=database.getLocationDAO().getLocation().get(position);
+                LocationData removeData = database.getLocationDAO().getLocation().get(position);
                 database.getLocationDAO().delete(removeData);//db항목 삭제
                 //알람 지우기---오류
-                alarm.removeAlarm(this,removeData);
+                alarm.removeAlarm(this, removeData);
 
                 setResult(RESULT_OK);
                 finish();
 
-                //알람 리스트 화면으로 돌아가기
-                Intent listIntent=new Intent(this,LifeRadiusActivity.class);
-                startActivityForResult(listIntent,0);
+//                //알람 리스트 화면으로 돌아가기
+//                Intent listIntent=new Intent(this,LifeRadiusActivity.class);
+//                startActivityForResult(listIntent,0);
         }
     }
 
-    private void InitView(){
+    private void InitView() {
 
-        mSearchPlace =findViewById(R.id.place_autocomplete_powered_by_google);
-        mPlaceDetailsText=findViewById(R.id.place_name);
+        mSearchPlace = findViewById(R.id.place_autocomplete_powered_by_google);
+        mPlaceDetailsText = findViewById(R.id.place_name);
         mPlaceDetailsAddress = findViewById(R.id.place_attribution);
-        mClearBtn=findViewById(R.id.clear_btn);
-        mTimeBtn=findViewById(R.id.timeBtn);
-        mStartTime=findViewById(R.id.start_time);
-        mSaveBtn=findViewById(R.id.saveBtn);
-        mRemoveBtn=findViewById(R.id.removeBtn);
+        mClearBtn = findViewById(R.id.clear_btn);
+        mTimeBtn = findViewById(R.id.timeBtn);
+        mStartTime = findViewById(R.id.start_time);
+        mSaveBtn = findViewById(R.id.saveBtn);
+        mRemoveBtn = findViewById(R.id.removeBtn);
 
         //요일
         tSun = findViewById(R.id.tSun);
@@ -222,7 +225,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         tFri.setOnCheckedChangeListener(this);
         tSat.setOnCheckedChangeListener(this);
 
-        mAdapter=new PlaceAutocompleteAdapter(this,mGeoDataClient,BOUNDS_GRATER_KOREA,null);
+        mAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient, BOUNDS_GRATER_KOREA, null);//어댑터 안에 필터 있음
         mSearchPlace.setAdapter(mAdapter);
 
         mSearchPlace.setOnItemClickListener(mAutocompleteClickListener);
@@ -234,39 +237,41 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch(buttonView.getId()){
+        switch (buttonView.getId()) {
             case R.id.tSun:
-               setDayOfWeek(0,isChecked);
+                setDayOfWeek(0, isChecked);
                 break;
             case R.id.tMon:
-                setDayOfWeek(1,isChecked);
+                setDayOfWeek(1, isChecked);
                 break;
             case R.id.tTue:
-                setDayOfWeek(2,isChecked);
+                setDayOfWeek(2, isChecked);
                 break;
             case R.id.tWed:
-                setDayOfWeek(3,isChecked);
+                setDayOfWeek(3, isChecked);
                 break;
             case R.id.tThur:
-                setDayOfWeek(4,isChecked);
+                setDayOfWeek(4, isChecked);
                 break;
             case R.id.tFri:
-                setDayOfWeek(5,isChecked);
+                setDayOfWeek(5, isChecked);
                 break;
             case R.id.tSat:
-                setDayOfWeek(6,isChecked);
+                setDayOfWeek(6, isChecked);
                 break;
         }
 
-        Log.d("요일 선택",""+ mDayOfWeek);
+        Log.d("요일 선택", "" + mDayOfWeek);
         locationData.setMDay_of_week(mDayOfWeek);
+
     }
+
     //선택된 요일 bit계산
-    private void setDayOfWeek(int day, boolean checked){
-        if(checked)
-            mDayOfWeek |=(1<<day);
+    private void setDayOfWeek(int day, boolean checked) {
+        if (checked)
+            mDayOfWeek |= (1 << day);
         else
-            mDayOfWeek &=~(1<<day);
+            mDayOfWeek &= ~(1 << day);
     }
 
     private void checkDayOfWeek(int dayOfWeek) {
@@ -311,16 +316,14 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         }
     }
 
-    private AdapterView.OnItemClickListener mAutocompleteClickListener=
+    private AdapterView.OnItemClickListener mAutocompleteClickListener =
             new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    final AutocompletePrediction item=mAdapter.getItem(position);
-                    final String placeId=item.getPlaceId();
-                    final CharSequence primaryText=item.getPrimaryText(null);
-
-                    Log.i("선택", "Autocomplete item selected: " + primaryText);
+                    final AutocompletePrediction item = mAdapter.getItem(position);
+                    final String placeId = item.getPlaceId();
+                    //final CharSequence primaryText=item.getPrimaryText(null);
 
                     Task<PlaceBufferResponse> placeResult = mGeoDataClient.getPlaceById(placeId);
                     placeResult.addOnCompleteListener(mUpdatePlaceDetailsCallback);
@@ -335,20 +338,20 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         public void onComplete(Task<PlaceBufferResponse> task) {
             try {
                 PlaceBufferResponse places = task.getResult();
-
+                Log.d("자동완성", "" + places.get(0));
                 // Get the Place object from the buffer.
                 final Place place = places.get(0);
 
-                LatLng latLng=place.getLatLng();
+                LatLng latLng = place.getLatLng();
 
                 locationData.setMLatitude(latLng.latitude);
                 locationData.setMLongitude(latLng.longitude);
 
                 mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName()));
-                mPlaceDetailsAddress.setText(formatPlaceDetails(getResources(),place.getAddress()));
+                mPlaceDetailsAddress.setText(formatPlaceDetails(getResources(), place.getAddress()));
 
-                data_Location_name =formatPlaceDetails(getResources(), place.getName()).toString();
-                data_Location_address=formatPlaceDetails(getResources(),place.getAddress()).toString();
+                data_Location_name = formatPlaceDetails(getResources(), place.getName()).toString();
+                data_Location_address = formatPlaceDetails(getResources(), place.getAddress()).toString();
 
                 //장소 저장
                 locationData.setMLocation_name(data_Location_name);
@@ -375,9 +378,10 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         }
     };
 
-    private static Spanned formatPlaceDetails(Resources res,CharSequence name) {
+    private static Spanned formatPlaceDetails(Resources res, CharSequence name) {
 
-        return Html.fromHtml(res.getString(R.string.place_details,name));
+        return Html.fromHtml(res.getString(R.string.place_details, name));
     }
+
 
 }

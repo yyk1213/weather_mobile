@@ -60,6 +60,7 @@ public class Alarm {
             calendar.setTime(new Date());
             calendar.set(calendar.HOUR_OF_DAY, mHour);//1시간 전에 설정하기
             calendar.set(calendar.MINUTE, mMin);
+            calendar.set(Calendar.MILLISECOND,0);
 
             //요일 받아오기
 //            int mDayOfWeek=locationData.getMDay_of_week();

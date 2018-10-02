@@ -23,7 +23,7 @@ import com.example.yeon1213.myapplication.R;
 
 import java.util.List;
 
-public class LifeRadiusActivity extends AppCompatActivity implements View.OnClickListener{
+public class LifeRadiusActivity extends AppCompatActivity implements View.OnClickListener {
     private RecyclerView mRadiusRecyclerView;
     private RadiusAdapter mAdapter;
     private RecyclerView.LayoutManager radius_LayoutManager;
@@ -38,17 +38,17 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
         getSupportActionBar().setTitle("생활반경 설정");
 
-        mRadiusRecyclerView=findViewById(R.id.radius_recycler_view);
+        mRadiusRecyclerView = findViewById(R.id.radius_recycler_view);
         mRadiusRecyclerView.setHasFixedSize(true);
 
-        radius_LayoutManager=new LinearLayoutManager(getApplicationContext());
+        radius_LayoutManager = new LinearLayoutManager(getApplicationContext());
         mRadiusRecyclerView.setLayoutManager(radius_LayoutManager);
 
-        fab=findViewById(R.id.radius_plus_btn);
+        fab = findViewById(R.id.radius_plus_btn);
         fab.setOnClickListener(this);
 
-        database=LocationDatabase.getDataBase(this);
-        alarm=new Alarm();
+        database = LocationDatabase.getDataBase(this);
+        alarm = new Alarm();
 
         updateUI();
     }
@@ -56,15 +56,15 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View v) {
         //플로팅 버튼 누를 때
-        Intent settingRadiusIntent=new Intent(LifeRadiusActivity.this,SettingLifeRadiusActivity.class);
-        startActivity(settingRadiusIntent);
+        Intent settingRadiusIntent = new Intent(LifeRadiusActivity.this, SettingLifeRadiusActivity.class);
+        startActivityForResult(settingRadiusIntent,0);
     }
 
-    private void updateUI(){
+    private void updateUI() {
 
-        List<LocationData> radius=database.getLocationDAO().getLocation();
+        List<LocationData> radius = database.getLocationDAO().getLocation();
 
-        mAdapter=new RadiusAdapter(this, radius);
+        mAdapter = new RadiusAdapter(this, radius);
 
         mRadiusRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -72,10 +72,15 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode==RESULT_OK){
+            updateUI();
+        }
         super.onActivityResult(requestCode, resultCode, data);
+
     }
 
-    private class RadiusHolder extends RecyclerView.ViewHolder implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener{
+    private class RadiusHolder extends RecyclerView.ViewHolder implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener {
 
         public TextView mLocationNameTextView;
         public TextView mTimeTextView;
@@ -86,12 +91,12 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         public RadiusHolder(View itemView) {
             super(itemView);
 
-            mLocationNameTextView =itemView.findViewById(R.id.radius_location);
-            mTimeTextView=itemView.findViewById(R.id.radius_time);
-            mDayOfWeekTextView=itemView.findViewById(R.id.radius_day_of_week);
-            mAlarmSwitch =itemView.findViewById(R.id.radius_check);
+            mLocationNameTextView = itemView.findViewById(R.id.radius_location);
+            mTimeTextView = itemView.findViewById(R.id.radius_time);
+            mDayOfWeekTextView = itemView.findViewById(R.id.radius_day_of_week);
+            mAlarmSwitch = itemView.findViewById(R.id.radius_check);
 
-            mView=itemView;
+            mView = itemView;
             mView.setOnClickListener(this);
 
             mAlarmSwitch.setOnCheckedChangeListener(this);
@@ -100,56 +105,61 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         @Override
         public void onClick(View v) {
 
-            int position=(int)mView.getTag();
+            int position = (int) mView.getTag();
             //알람이 활성화 돼 있으면 db 내용을 편잡하게 한다.
-            if(database.getLocationDAO().getLocation().get(position).getMAlarmCheck()){
+//            if (database.getLocationDAO().getLocation().get(position).getMAlarmCheck()) {
 
-                int id=database.getLocationDAO().getLocation().get(position).getMId();
+                int id = database.getLocationDAO().getLocation().get(position).getMId();
 
-                Intent settingRadiusIntent=new Intent(LifeRadiusActivity.this,SettingLifeRadiusActivity.class);
-                settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_DATA_ID,id);
+                Intent settingRadiusIntent = new Intent(LifeRadiusActivity.this, SettingLifeRadiusActivity.class);
+                settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_DATA_ID, id);
                 settingRadiusIntent.putExtra(SettingLifeRadiusActivity.EXTRA_DATA_POSITION, position);
 
-                startActivityForResult(settingRadiusIntent,0);
+                startActivityForResult(settingRadiusIntent, 0);
 
-            }else{
-                itemView.setEnabled(false);
-            }
+//            } else {
+//                itemView.setEnabled(false);
+//            }
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-            int position=(int)mView.getTag();
-            LocationData locationData=database.getLocationDAO().getLocation().get(position);
+            int position = (int) mView.getTag();
+            LocationData locationData = database.getLocationDAO().getLocation().get(position);
 
-            if(isChecked){
+            if (isChecked) {
                 //체크가 되면 뷰항목을 누를 수 있고 알람이 설정된다.
+                itemView.setEnabled(true);
                 alarm.setAlarm(getApplicationContext(), locationData);
                 locationData.setMAlarmCheck(true);
 
-            }else{
+            } else {
                 //뷰항목이 비활성화 되고 알람이 취소된다.
-                alarm.removeAlarm(getApplicationContext(),locationData);
+                itemView.setEnabled(false);
+                alarm.removeAlarm(getApplicationContext(), locationData);
                 locationData.setMAlarmCheck(false);
             }
+
             database.getLocationDAO().update(locationData);
+            //mAdapter.notifyDataSetChanged();
         }
     }
 
-    private class RadiusAdapter extends RecyclerView.Adapter<RadiusHolder>{
+    private class RadiusAdapter extends RecyclerView.Adapter<RadiusHolder> {
         private List<LocationData> mRadius;
         private Context context;
+        private boolean onBind;
 
         public RadiusAdapter(Context context, List<LocationData> mRadius) {
             this.mRadius = mRadius;
-            this.context=context;
+            this.context = context;
         }
 
         @Override
         public RadiusHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater=LayoutInflater.from(context);
-            View view=layoutInflater.inflate(R.layout.radius_row,parent,false);
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            View view = layoutInflater.inflate(R.layout.radius_row, parent, false);
 
             return new RadiusHolder(view);
         }
@@ -158,13 +168,13 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
         public void onBindViewHolder(RadiusHolder holder, int position) {
             holder.mView.setTag(position);
 
-            LocationData radius=mRadius.get(position);
+            LocationData radius = mRadius.get(position);
             holder.mLocationNameTextView.setText(radius.getMLocation_name());
             holder.mTimeTextView.setText(radius.getMTime());
             holder.mDayOfWeekTextView.setText(getDayOfWeek(radius.getMDay_of_week()) + "요일");
             holder.mAlarmSwitch.setChecked(radius.getMAlarmCheck());
 
-            Log.d("요일",""+getDayOfWeek(radius.getMDay_of_week()));
+            Log.d("요일", "" + getDayOfWeek(radius.getMDay_of_week()));
         }
 
         @Override
@@ -172,59 +182,50 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             return mRadius.size();
         }
 
-        private String getDayOfWeek(int dayOfWeek){
+        private String getDayOfWeek(int dayOfWeek) {
 
-            String mDayOfWeek="";
+            String mDayOfWeek = "";
 
-            for(int day=0; day<7; day++) {
+            for (int day = 0; day < 7; day++) {
                 switch (day) {
                     case 0:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="일";
+                            mDayOfWeek += "일";
                         }
                         break;
                     case 1:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="월";
+                            mDayOfWeek += "월";
                         }
                         break;
                     case 2:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="화";
+                            mDayOfWeek += "화";
                         }
                         break;
                     case 3:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="수";
+                            mDayOfWeek += "수";
                         }
                         break;
                     case 4:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="목";
+                            mDayOfWeek += "목";
                         }
                         break;
                     case 5:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="금";
+                            mDayOfWeek += "금";
                         }
                         break;
                     case 6:
                         if (((dayOfWeek >> day) & 1) == 1) {
-                            mDayOfWeek +="토";
+                            mDayOfWeek += "토";
                         }
                         break;
                 }
             }
             return mDayOfWeek;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        this.finish();
-
-        Intent mainIntent=new Intent(this,MainActivity.class);
-        startActivityForResult(mainIntent,0);
     }
 }
