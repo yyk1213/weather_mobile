@@ -45,7 +45,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
     protected GeoDataClient mGeoDataClient;
     private AutoCompleteTextView mSearchPlace;
-    private PlaceAutocompleteAdapter mAdapter;
+    private CustomAutoCompleteAdapter mAdapter;
     private TextView mPlaceDetailsAddress;
     private TextView mPlaceDetailsText;
     private TextView mStartTime;
@@ -91,9 +91,6 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_life_radius);
         getSupportActionBar().setTitle("생활반경 설정");
-
-//        String a=String.valueOf(getIntent().getExtras().get(EXTRA_KEY));
-//        Toast.makeText(getApplicationContext(),a,Toast.LENGTH_SHORT).show();
 
         //저장db가져오기
         database = LocationDatabase.getDataBase(this);
@@ -177,10 +174,6 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 setResult(RESULT_OK);
                 finish();
 
-//                //알람 리스트 화면으로 돌아가기
-//                Intent radiusIntent=new Intent(this,LifeRadiusActivity.class);
-//                startActivityForResult(radiusIntent,0);
-
                 break;
             case R.id.removeBtn:
                 LocationData removeData = database.getLocationDAO().getLocation().get(position);
@@ -191,9 +184,6 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 setResult(RESULT_OK);
                 finish();
 
-//                //알람 리스트 화면으로 돌아가기
-//                Intent listIntent=new Intent(this,LifeRadiusActivity.class);
-//                startActivityForResult(listIntent,0);
         }
     }
 
@@ -225,7 +215,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         tFri.setOnCheckedChangeListener(this);
         tSat.setOnCheckedChangeListener(this);
 
-        mAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient, BOUNDS_GRATER_KOREA, null);//어댑터 안에 필터 있음
+        mAdapter = new CustomAutoCompleteAdapter(this, mGeoDataClient, BOUNDS_GRATER_KOREA, null);//어댑터 안에 필터 있음
         mSearchPlace.setAdapter(mAdapter);
 
         mSearchPlace.setOnItemClickListener(mAutocompleteClickListener);
@@ -321,7 +311,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    final AutocompletePrediction item = mAdapter.getItem(position);
+                    final AutocompletePrediction item = mAdapter.getPrediction_item(position);
                     final String placeId = item.getPlaceId();
                     //final CharSequence primaryText=item.getPrimaryText(null);
 
@@ -338,7 +328,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
         public void onComplete(Task<PlaceBufferResponse> task) {
             try {
                 PlaceBufferResponse places = task.getResult();
-                Log.d("자동완성", "" + places.get(0));
+
                 // Get the Place object from the buffer.
                 final Place place = places.get(0);
 
@@ -382,6 +372,4 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
 
         return Html.fromHtml(res.getString(R.string.place_details, name));
     }
-
-
 }

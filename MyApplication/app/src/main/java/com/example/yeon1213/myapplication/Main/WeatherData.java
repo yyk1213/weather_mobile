@@ -38,6 +38,7 @@ public class WeatherData{
     private String precipitation;
     private String humidity;
     private String wind;
+    private String station;
     //생활기상지수 데이터
     private String heatIndex;
     private String wctIndex;
@@ -46,7 +47,8 @@ public class WeatherData{
     private String uvIndex;
     private String laundry;
     //미세먼지
-    private  String dust;
+    private String dust;
+    private String dust_comment;
     private int temp=0;
 
     public WeatherData() {
@@ -84,12 +86,20 @@ public class WeatherData{
         return dust;
     }
 
-    public void getData(double latitude, double longitude) {
+    public String getDust_comment() {
+        return dust_comment;
+    }
+
+    public void setDust_comment(String dust_comment) {
+        this.dust_comment = dust_comment;
+    }
+
+    public void getWeatherAPIData(double latitude, double longitude){
 
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
         ApiService apiService = retrofit.create(ApiService.class);
         //시간별 날씨---분단위로 바꾸기
-        Call<Data> call = apiService.getHourly(ApiService.APPKEY, 2, latitude, longitude);
+        Call<Data> call = apiService.getMinutely(ApiService.APPKEY, 2, latitude, longitude);
 
         call.enqueue(new Callback<Data>() {
             @Override
@@ -98,13 +108,12 @@ public class WeatherData{
                     //시간별 데이터를 받음-- 나중에 분별로 바꾸기
                     weatherData = response.body().getWeather();
 
-                    Log.d("Hourly DATA 결과", "" + weatherData.getHourly().get(temp).getGrid().getVillage());
                     if (weatherData != null) {
-                        temperature = weatherData.getHourly().get(temp).getTemperature().getTc();
-                        Log.d("함수 온도", "" + temperature);
-                        precipitation = weatherData.getHourly().get(temp).getPrecipitation().getSinceOntime();
-                        humidity = weatherData.getHourly().get(temp).getHumidity();
-                        wind = weatherData.getHourly().get(temp).getWind().getWdir();
+                        temperature = weatherData.getMinutely().get(temp).getTemperature().getTc();
+                        precipitation = weatherData.getMinutely().get(temp).getPrecipitation().getSinceOntime();
+                        humidity = weatherData.getMinutely().get(temp).getHumidity();
+                        wind = weatherData.getMinutely().get(temp).getWind().getWdir();
+                        station=weatherData.getMinutely().get(temp).getStation().getName();
 
                         mListener.onWeatherResponseAvailable();
                     }
@@ -117,6 +126,13 @@ public class WeatherData{
                 Log.e("fail", "" + t.toString());
             }
         });
+    }
+
+    public void getIndexData(double latitude, double longitude) {
+
+        Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
+        ApiService apiService = retrofit.create(ApiService.class);
+
         //열지수
         Call<Data> call_heat = apiService.getHeat(ApiService.APPKEY, 2, latitude, longitude);
         call_heat.enqueue(new Callback<Data>() {
@@ -199,77 +215,84 @@ public class WeatherData{
             }
         });
 
-//        Call<Data> call_uvIndex = apiService.getUv(ApiService.APPKEY, 2, latitude, longitude);
-//        call_uvIndex.enqueue(new Callback<Data>() {
-//            @Override
-//            public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
-//                if (response.isSuccessful()) {
-//                    uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
-//                    Log.d("uvIndex", "" + uvIndex);
-//                    if (uvIndex != null) {
-//                        livingData.add("자외선지수: " + uvIndex);
-//                        mListener.onIndexResponseAvailable();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Data> call_uvIndex, Throwable t) {
-//
-//            }
-//        });
-//        Call<Data> call_Laundry = apiService.getLaundry(ApiService.APPKEY, 2, latitude, longitude);
-//
-//        call_Laundry.enqueue(new Callback<Data>() {
-//            @Override
-//            public void onResponse(Call<Data> call_Laundry, Response<Data> response) {
-//
-//                if (response.isSuccessful()) {
-//                    Log.d("데이터 성공?", "");
-//                    //시간별 데이터를 받음
-//                    laundry = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay01().getComment();
-//                    Log.d("laundry", "" + laundry);
-//                    if (laundry != null) {
-//                        livingData.add("빨래지수" + laundry);
-//                        mListener.onIndexResponseAvailable();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Data> call_Laundry, Throwable t) {
-//
-//            }
-//        });
-//
-//        //통신 가로채서 값 보여주는 것
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//
-//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-//
-//        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
-//        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
-//
-//        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY, 10, 10, 1, 1, "강남구", "DAILY", 1.3, "json");
-//        call_dust.enqueue(new Callback<FineDust>() {
-//            @Override
-//            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
-//                Log.d("미세먼지", "응답");
-//                if (response.isSuccessful()) {
-//                    //통합대기환경지수
-//                    dust = response.body().getList().get(0).getKhaiGrade();
-//                    Log.d("미세먼지", "" + dust);
-//                    mListener.onIndexResponseAvailable();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<FineDust> call_dust, Throwable t) {
-//                Log.e("미세먼지 에러", "" + t.toString());
-//            }
-//        });
-//    }
+        Call<Data> call_uvIndex = apiService.getUv(ApiService.APPKEY, 2, latitude, longitude);
+        call_uvIndex.enqueue(new Callback<Data>() {
+            @Override
+            public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
+                if (response.isSuccessful()) {
+                    uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
+                    Log.d("uvIndex", "" + uvIndex);
+                    if (uvIndex != null) {
+                        livingData.add("자외선지수: " + uvIndex);
+                        mListener.onIndexResponseAvailable();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Data> call_uvIndex, Throwable t) {
+
+            }
+        });
+        Call<Data> call_Laundry = apiService.getLaundry(ApiService.APPKEY, 2, latitude, longitude);
+
+        call_Laundry.enqueue(new Callback<Data>() {
+            @Override
+            public void onResponse(Call<Data> call_Laundry, Response<Data> response) {
+
+                if (response.isSuccessful()) {
+                    //시간별 데이터를 받음
+                    laundry = response.body().getWeather().getWIndex().getLaundry().get(0).getDay01().getComment();
+                    if (laundry != null) {
+                        livingData.add("빨래지수: " + laundry);
+                        mListener.onIndexResponseAvailable();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Data> call_Laundry, Throwable t) {
+
+            }
+        });
+
+        //통신 가로채서 값 보여주는 것
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
+        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
+        //minutely의 station 값을 미세먼지가 늦게 받아와서 오류가 뜬다.// 어떻게 받을지 생각하기...
+        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY, 10, 10, 1, 1, "강남구", "DAILY", 1.3, "json");
+        call_dust.enqueue(new Callback<FineDust>() {
+            @Override
+            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
+                if (response.isSuccessful()) {
+                    //통합대기환경지수
+                    dust = response.body().getList().get(0).getKhaiGrade();
+                    dust_comment=commentFineDust(dust);
+
+                    Log.d("미세먼지", "" + dust);
+                    mListener.onIndexResponseAvailable();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FineDust> call_dust, Throwable t) {
+                Log.e("미세먼지 에러", "" + t.toString());
+            }
+        });
+    }
+
+    private String commentFineDust(String dust){
+        if(dust.equals("1")) return "좋음";
+        else if(dust.equals("2")) return "보통";
+        else if(dust.equals("3")) return "나쁨";
+        else if(dust.equals("4")) return "매우 나쁨";
+
+        return "";
     }
 }
 

@@ -27,6 +27,9 @@ public interface ApiService {
     @GET("current/hourly")
     Call<Data> getHourly(@Header("appKey")String appKey, @Query("version")int version,
                          @Query("lat")double lat, @Query("lon")double lon);
+    @GET("current/minutely")
+    Call<Data> getMinutely(@Header("appKey")String appKey, @Query("version")int version,
+                         @Query("lat")double lat, @Query("lon")double lon);
     //생활기상지수 받아오기
     @GET("index/wct")
     Call<Data> getWct(@Header("appKey")String appKey, @Query("version")int version,

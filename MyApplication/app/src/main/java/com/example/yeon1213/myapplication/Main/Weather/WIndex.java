@@ -55,19 +55,19 @@ public class WIndex {
         this.carWash = carWash;
     }
 
-    @SerializedName("uvIndex")
+    @SerializedName("uvindex")
     @Expose
-    private List<UvIndex> uvIndex = null;
+    private List<Uvindex> uvindex = null;
     @SerializedName("timeRelease")
     @Expose
     private String timeRelease;
 
-    public List<UvIndex> getUvIndex() {
-        return uvIndex;
+    public List<Uvindex> getUvIndex() {
+        return uvindex;
     }
 
-    public void setUvIndex(List<UvIndex> uvIndex) {
-        this.uvIndex = uvIndex;
+    public void setUvIndex(List<Uvindex> uvIndex) {
+        this.uvindex = uvindex;
     }
 
     public String getTimeRelease() {
@@ -78,4 +78,15 @@ public class WIndex {
         this.timeRelease = timeRelease;
     }
 
+    @SerializedName("laundry")
+    @Expose
+    private List<Laundry> laundry=null;
+
+    public List<Laundry> getLaundry() {
+        return laundry;
+    }
+
+    public void setLaundry(List<Laundry> laundry) {
+        this.laundry = laundry;
+    }
 }

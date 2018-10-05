@@ -39,12 +39,21 @@ public class CustomAutoCompleteAdapter extends ArrayAdapter implements Filterabl
     private AutocompleteFilter mPlaceFilter;
     private ArrayList<String> mResultList;
     private LatLngBounds mBounds;
+    private ArrayList<AutocompletePrediction> prediction_item;
 
     public CustomAutoCompleteAdapter(@NonNull Context context,GeoDataClient mGeoDataClient, LatLngBounds mBounds,AutocompleteFilter mPlaceFilter) {
         super(context,android.R.layout.simple_expandable_list_item_2,android.R.id.text1);
         this.mGeoDataClient = mGeoDataClient;
         this.mPlaceFilter = mPlaceFilter;
         this.mBounds = mBounds;
+    }
+
+    public AutocompletePrediction getPrediction_item(int position) {
+        return prediction_item.get(position);
+    }
+
+    public void setPrediction_item(ArrayList<AutocompletePrediction> prediction_item) {
+        this.prediction_item = prediction_item;
     }
 
     @Override
@@ -82,24 +91,25 @@ public class CustomAutoCompleteAdapter extends ArrayAdapter implements Filterabl
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults results=new FilterResults();
+                FilterResults results=new FilterResults();//결과 값 담기
 
-                ArrayList<AutocompletePrediction> resultList=new ArrayList<>();
-                ArrayList<String> filterData=new ArrayList<>();
+                //ArrayList<AutocompletePrediction> filterData=new ArrayList<>();
+                ArrayList<String> filterData_String=new ArrayList<>();
 
                 if(constraint !=null){
-                    resultList=getAutocomplete(constraint);
+                    filterData_String=getAutocomplete(constraint);
                 }
 
-                results.values=resultList;
-                if(resultList!=null){
-                    results.count=0;
+                results.values=filterData_String;
+                if(filterData_String!=null){
+                    results.count=filterData_String.size();
                 }
                 return results;
             }
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
+
                 if(results!=null && results.count>0){
                     mResultList=(ArrayList<String>)results.values;
                             notifyDataSetChanged();
@@ -122,7 +132,7 @@ public class CustomAutoCompleteAdapter extends ArrayAdapter implements Filterabl
     }
 
     //자동완성
-    private ArrayList<AutocompletePrediction> getAutocomplete(CharSequence constraint) {
+    private ArrayList<String> getAutocomplete(CharSequence constraint) {
         Log.i(TAG, "Starting autocomplete query for: " + constraint);
 
         // Submit the query to the autocomplete API and retrieve a PendingResult that will
@@ -141,12 +151,18 @@ public class CustomAutoCompleteAdapter extends ArrayAdapter implements Filterabl
 
         try {
             AutocompletePredictionBufferResponse autocompletePredictions = results.getResult();
+            ArrayList<AutocompletePrediction> autoCompleteList=DataBufferUtils.freezeAndClose(autocompletePredictions);
 
-            Log.i(TAG, "Query completed. Received " + autocompletePredictions.getCount()
-                    + " predictions.");
+            ArrayList<String> auto_result=new ArrayList<>();
+            prediction_item=new ArrayList<>();
 
-            // Freeze the results immutable representation that can be stored safely.
-            return DataBufferUtils.freezeAndClose(autocompletePredictions);
+            for(AutocompletePrediction prediction:autoCompleteList){
+                    auto_result.add(prediction.getFullText(null).toString());
+                    prediction_item.add(prediction);
+            }
+
+            return auto_result;
+
         } catch (RuntimeExecutionException e) {
             // If the query did not complete successfully return null
             Toast.makeText(getContext(), "Error contacting API: " + e.toString(),

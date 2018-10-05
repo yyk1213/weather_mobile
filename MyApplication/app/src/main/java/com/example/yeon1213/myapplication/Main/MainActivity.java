@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onWeatherResponseAvailable() {
                 temperature.setText(main_weatherData.getTemperature());
-                fine_dust.setText(main_weatherData.getDust());
+                fine_dust.setText(main_weatherData.getDust()+" "+main_weatherData.getDust_comment());
                 precipitation.setText(main_weatherData.getPrecipitation());
                 humidity.setText(main_weatherData.getHumidity());
                 wind.setText(main_weatherData.getWind());
@@ -83,7 +82,8 @@ public class MainActivity extends AppCompatActivity{
         main_RecyclerView.setLayoutManager(main_LayoutManager);
 
         //날씨 값 가져오기
-        main_weatherData.getData(latitude,longitude);
+        main_weatherData.getWeatherAPIData(latitude,longitude);
+        main_weatherData.getIndexData(latitude,longitude);
 
 //        //좌표를 주소로 변환
 //        final Geocoder geocoder=new Geocoder(this);

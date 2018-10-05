@@ -4,10 +4,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.example.yeon1213.myapplication.DataBase.LocationData;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -49,22 +51,27 @@ public class Alarm {
 
             int mHour, mMin;
             alarm_id = locationData.getMId();
+
+            //요일을 받아와서
+            //요일 갯수에 맞게
+            //알람을 각자 설정한다.
+            //요일 받아오기
+            int mDayOfWeek=locationData.getMDay_of_week();
+//            int DB_ID=locationData.getMId();
+//            getDayOfWeek(mDayOfWeek,DB_ID);//db에 설정된 요일이랑, 갯수 알기
+
             //시간 받아오기
             String[] time = mTime.split(":");
             mHour = Integer.parseInt(time[0].trim());
             mMin = Integer.parseInt(time[1].trim());
-
-            Log.d("시간알기", "" + mHour + ":" + mMin);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
             calendar.set(calendar.HOUR_OF_DAY, mHour);//1시간 전에 설정하기
             calendar.set(calendar.MINUTE, mMin);
             calendar.set(Calendar.MILLISECOND,0);
-
-            //요일 받아오기
-//            int mDayOfWeek=locationData.getMDay_of_week();
-//            getDayOfWeek(mDayOfWeek,calendar);
+            //요일 임의로 추가
+            //calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
 
             Log.d("캘린더", "" + calendar.toString());
 
@@ -85,7 +92,7 @@ public class Alarm {
             //알람 설정 시각에 발생하는 인텐트
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarm_id, receiverIntent, 0);
             //알람 설정
-            alarmManager.set(AlarmManager.RTC_WAKEUP, setTime, pendingIntent);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTime,AlarmManager.INTERVAL_DAY,pendingIntent);
 
             return true;
     }
@@ -115,27 +122,27 @@ public class Alarm {
             switch (day) {
                 case 0:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                     }
                     break;
                 case 1:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                     }
                     break;
                 case 2:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
                     }
                     break;
                 case 3:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
                     }
                     break;
                 case 4:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
                     }
                     break;
                 case 5:
@@ -145,7 +152,7 @@ public class Alarm {
                     break;
                 case 6:
                     if (((dayOfWeek >> day) & 1) == 1) {
-                        calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
                     }
                     break;
             }

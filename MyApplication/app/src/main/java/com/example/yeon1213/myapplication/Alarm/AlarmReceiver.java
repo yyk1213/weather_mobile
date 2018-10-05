@@ -16,8 +16,6 @@ import com.example.yeon1213.myapplication.Main.ResponseListener;
 import com.example.yeon1213.myapplication.Main.WeatherData;
 import com.example.yeon1213.myapplication.R;
 
-import org.w3c.dom.Text;
-
 public class AlarmReceiver extends BroadcastReceiver implements ResponseListener {
 
     private static final String TAG = "AlarmReceiver";
@@ -72,7 +70,7 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
 
         LocationData locationData = locationDatabase.getLocationDAO().getData(id);
 
-        receiver_weather_data.getData(locationData.getMLatitude(), locationData.getMLongitude());
+        receiver_weather_data.getWeatherAPIData(locationData.getMLatitude(), locationData.getMLongitude());
 
         location_name = locationData.getMLocation_name();
 

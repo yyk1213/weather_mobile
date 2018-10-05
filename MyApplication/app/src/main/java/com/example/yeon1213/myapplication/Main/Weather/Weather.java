@@ -30,4 +30,16 @@ public class Weather {
     public void setWIndex(WIndex wIndex) {
         this.wIndex = wIndex;
     }
+
+    @SerializedName("minutely")
+    @Expose
+    private List<Minutely> minutely = null;
+
+    public List<Minutely> getMinutely() {
+        return minutely;
+    }
+
+    public void setMinutely(List<Minutely> minutely) {
+        this.minutely = minutely;
+    }
 }
