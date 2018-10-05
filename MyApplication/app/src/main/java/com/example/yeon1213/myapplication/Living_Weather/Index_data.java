@@ -1,12 +1,12 @@
 package com.example.yeon1213.myapplication.Living_Weather;
 
-public class Living_data {
+public class Index_data {
     private String living_name;
     private String living_explanation;
 
-    public Living_data(){}
+    public Index_data(){}
 
-    public Living_data(String living_name, String living_explanation) {
+    public Index_data(String living_name, String living_explanation) {
         this.living_name = living_name;
         this.living_explanation=living_explanation;
     }

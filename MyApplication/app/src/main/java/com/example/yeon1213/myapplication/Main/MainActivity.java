@@ -21,6 +21,8 @@ import com.example.yeon1213.myapplication.Weather_alarm.WeatherAlarm;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.yeon1213.myapplication.Living_Weather.LivingWeather.EXTRA_ACTIVITY_POSITION;
+
 public class MainActivity extends AppCompatActivity{
     private TextView temperature, fine_dust, precipitation, humidity, wind,city,county,village;
     private double latitude, longitude;
@@ -114,20 +116,24 @@ public class MainActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.life:
-                Intent i = new Intent(MainActivity.this, LivingWeather.class);
-                startActivity(i);
+                Intent lifeIntent = new Intent(MainActivity.this, LivingWeather.class);
+                lifeIntent.putExtra(EXTRA_ACTIVITY_POSITION,item.getItemId());
+
+                startActivity(lifeIntent);
                 break;
             case R.id.health:
-                Intent i1 = new Intent(MainActivity.this, HealthWeather.class);
-                startActivity(i1);
+                Intent healthIntent = new Intent(MainActivity.this, LivingWeather.class);
+                healthIntent.putExtra(EXTRA_ACTIVITY_POSITION,item.getItemId());
+
+                startActivity(healthIntent);
                 break;
             case R.id.life_radius_setting:
-                Intent i2 = new Intent(MainActivity.this, LifeRadiusActivity.class);
-                startActivity(i2);
+                Intent lifeSettingIntent = new Intent(MainActivity.this, LifeRadiusActivity.class);
+                startActivity(lifeSettingIntent);
                 break;
             case R.id.weather_alarm:
-                Intent i3 = new Intent(MainActivity.this, WeatherAlarm.class);
-                startActivity(i3);
+                Intent weatherAlarmIntent = new Intent(MainActivity.this, WeatherAlarm.class);
+                startActivity(weatherAlarmIntent);
                 break;
         }
         return true;

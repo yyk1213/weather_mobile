@@ -142,14 +142,12 @@ public class LifeRadiusActivity extends AppCompatActivity implements View.OnClic
             }
 
             database.getLocationDAO().update(locationData);
-            //mAdapter.notifyDataSetChanged();
         }
     }
 
     private class RadiusAdapter extends RecyclerView.Adapter<RadiusHolder> {
         private List<LocationData> mRadius;
         private Context context;
-        private boolean onBind;
 
         public RadiusAdapter(Context context, List<LocationData> mRadius) {
             this.mRadius = mRadius;
