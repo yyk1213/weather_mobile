@@ -18,4 +18,5 @@ public interface LocationDAO extends BaseDao<LocationData> {
 
     @Query("SELECT * FROM LocationData Where mId =:ID")
     LocationData getData(int ID);
+    //
 }
