@@ -1,5 +1,7 @@
 package com.example.yeon1213.myapplication.Main;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.yeon1213.myapplication.Main.Weather.Data;
@@ -28,11 +30,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class WeatherData{
 
     private Weather weatherData; //날씨 데이터 넣는 것
     private List<String> livingData=new ArrayList<>();//리사이클러뷰에 담는 생활기상지수
     private ResponseListener mListener;//응답 값이 왔는지 확인하는 리스너
+    private Context context;
     //날씨 데이터
     private String temperature;
     private String precipitation;
@@ -94,6 +99,14 @@ public class WeatherData{
         this.dust_comment = dust_comment;
     }
 
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     public void getWeatherAPIData(double latitude, double longitude){
 
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
@@ -133,128 +146,160 @@ public class WeatherData{
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
         ApiService apiService = retrofit.create(ApiService.class);
 
-        //열지수
-        Call<Data> call_heat = apiService.getHeat(ApiService.APPKEY, 2, latitude, longitude);
-        call_heat.enqueue(new Callback<Data>() {
-            @Override
-            public void onResponse(Call<Data> call_heat, Response<Data> response) {
-                if (response.isSuccessful()) {
-                    heatIndex = response.body().getWeather().getWIndex().getHeatIndex().get(0).getCurrent().getIndex();
-                    Log.d("열지수", "" + heatIndex);
-                    if (heatIndex != null) {
-                        livingData.add("열지수: " + heatIndex);
-                        mListener.onIndexResponseAvailable();
+        SharedPreferences indexSetting_pref=context.getSharedPreferences("index_setting", MODE_PRIVATE);
+        boolean fire_Index=indexSetting_pref.getBoolean("열지수",false);
+
+        if(fire_Index) {
+            //열지수
+            Call<Data> call_heat = apiService.getHeat(ApiService.APPKEY, 2, latitude, longitude);
+            call_heat.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call_heat, Response<Data> response) {
+                    if (response.isSuccessful()) {
+                        heatIndex = response.body().getWeather().getWIndex().getHeatIndex().get(0).getCurrent().getIndex();
+                        Log.d("열지수", "" + heatIndex);
+                        if (heatIndex != null) {
+                            livingData.add("열지수: " + heatIndex);
+                            mListener.onIndexResponseAvailable();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Data> call_heat, Throwable t) {
-                Log.e("fail", "" + t.toString());
-            }
-        });
+                @Override
+                public void onFailure(Call<Data> call_heat, Throwable t) {
+                    Log.e("fail", "" + t.toString());
+                }
+            });
+        }
 
-        Call<Data> call_wct = apiService.getWct(ApiService.APPKEY, 2, latitude, longitude);
-        call_wct.enqueue(new Callback<Data>() {
-            @Override
-            public void onResponse(Call<Data> call_wct, Response<Data> response) {
-                if (response.isSuccessful()) {
-                    wctIndex = response.body().getWeather().getWIndex().getWctIndex().get(0).getCurrent().getIndex();
-                    Log.d("wctIndex", "" + wctIndex);
-                    if (wctIndex != null) {
-                        livingData.add("체감온도: " + wctIndex);
-                        mListener.onIndexResponseAvailable();
+        boolean tem_index=indexSetting_pref.getBoolean("체감온도",false);
+
+        if(tem_index) {
+
+            Call<Data> call_wct = apiService.getWct(ApiService.APPKEY, 2, latitude, longitude);
+            call_wct.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call_wct, Response<Data> response) {
+                    if (response.isSuccessful()) {
+                        wctIndex = response.body().getWeather().getWIndex().getWctIndex().get(0).getCurrent().getIndex();
+                        Log.d("wctIndex", "" + wctIndex);
+                        if (wctIndex != null) {
+                            livingData.add("체감온도: " + wctIndex);
+                            mListener.onIndexResponseAvailable();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Data> call_wct, Throwable t) {
+                @Override
+                public void onFailure(Call<Data> call_wct, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
 
-        Call<Data> call_thIndex = apiService.getTh(ApiService.APPKEY, 2, latitude, longitude);
-        call_thIndex.enqueue(new Callback<Data>() {
-            @Override
-            public void onResponse(Call<Data> call_thIndex, Response<Data> response) {
-                if (response.isSuccessful()) {
-                    thIndex = response.body().getWeather().getWIndex().getThIndex().get(0).getCurrent().getIndex();
-                    Log.d("thIndex", "" + thIndex);
-                    if (thIndex != null) {
-                        livingData.add("불쾌지수: " + thIndex);
-                        mListener.onIndexResponseAvailable();
+        boolean uncomfortable_index=indexSetting_pref.getBoolean("불쾌지수",false);
+
+        if(uncomfortable_index) {
+
+            Call<Data> call_thIndex = apiService.getTh(ApiService.APPKEY, 2, latitude, longitude);
+            call_thIndex.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call_thIndex, Response<Data> response) {
+                    if (response.isSuccessful()) {
+                        thIndex = response.body().getWeather().getWIndex().getThIndex().get(0).getCurrent().getIndex();
+                        Log.d("thIndex", "" + thIndex);
+                        if (thIndex != null) {
+                            livingData.add("불쾌지수: " + thIndex);
+                            mListener.onIndexResponseAvailable();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Data> call_thIndex, Throwable t) {
+                @Override
+                public void onFailure(Call<Data> call_thIndex, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
 
-        Call<Data> call_carwash = apiService.getCarwash(ApiService.APPKEY, 2, latitude, longitude);
-        call_carwash.enqueue(new Callback<Data>() {
-            @Override
-            public void onResponse(Call<Data> call_carwash, Response<Data> response) {
+        boolean carwash_index=indexSetting_pref.getBoolean("세차지수",false);
 
-                if (response.isSuccessful()) {
-                    carWash = response.body().getWeather().getWIndex().getCarWash().get(0).getComment();
-                    Log.d("세차지수", "" + carWash);
-                    if (carWash != null) {
-                        livingData.add("세차지수:" + carWash);
-                        mListener.onIndexResponseAvailable();
+        if(carwash_index) {
+
+            Call<Data> call_carwash = apiService.getCarwash(ApiService.APPKEY, 2, latitude, longitude);
+            call_carwash.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call_carwash, Response<Data> response) {
+
+                    if (response.isSuccessful()) {
+                        carWash = response.body().getWeather().getWIndex().getCarWash().get(0).getComment();
+                        Log.d("세차지수", "" + carWash);
+                        if (carWash != null) {
+                            livingData.add("세차지수:" + carWash);
+                            mListener.onIndexResponseAvailable();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Data> call_carwash, Throwable t) {
-                Log.e("fail", "" + t.toString());
-            }
-        });
+                @Override
+                public void onFailure(Call<Data> call_carwash, Throwable t) {
+                    Log.e("fail", "" + t.toString());
+                }
+            });
+        }
 
-        Call<Data> call_uvIndex = apiService.getUv(ApiService.APPKEY, 2, latitude, longitude);
-        call_uvIndex.enqueue(new Callback<Data>() {
-            @Override
-            public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
-                if (response.isSuccessful()) {
-                    uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
-                    Log.d("uvIndex", "" + uvIndex);
-                    if (uvIndex != null) {
-                        livingData.add("자외선지수: " + uvIndex);
-                        mListener.onIndexResponseAvailable();
+        boolean uv_Index=indexSetting_pref.getBoolean("자외선지수",false);
+
+        if(uv_Index) {
+
+            Call<Data> call_uvIndex = apiService.getUv(ApiService.APPKEY, 2, latitude, longitude);
+            call_uvIndex.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
+                    if (response.isSuccessful()) {
+                        uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
+                        Log.d("uvIndex", "" + uvIndex);
+                        if (uvIndex != null) {
+                            livingData.add("자외선지수: " + uvIndex);
+                            mListener.onIndexResponseAvailable();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Data> call_uvIndex, Throwable t) {
+                @Override
+                public void onFailure(Call<Data> call_uvIndex, Throwable t) {
 
-            }
-        });
-        Call<Data> call_Laundry = apiService.getLaundry(ApiService.APPKEY, 2, latitude, longitude);
+                }
+            });
+        }
 
-        call_Laundry.enqueue(new Callback<Data>() {
-            @Override
-            public void onResponse(Call<Data> call_Laundry, Response<Data> response) {
+        boolean laundry_index=indexSetting_pref.getBoolean("빨래지수",false);
 
-                if (response.isSuccessful()) {
-                    //시간별 데이터를 받음
-                    laundry = response.body().getWeather().getWIndex().getLaundry().get(0).getDay01().getComment();
-                    if (laundry != null) {
-                        livingData.add("빨래지수: " + laundry);
-                        mListener.onIndexResponseAvailable();
+        if(laundry_index) {
+
+            Call<Data> call_Laundry = apiService.getLaundry(ApiService.APPKEY, 2, latitude, longitude);
+
+            call_Laundry.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call_Laundry, Response<Data> response) {
+
+                    if (response.isSuccessful()) {
+                        //시간별 데이터를 받음
+                        laundry = response.body().getWeather().getWIndex().getLaundry().get(0).getDay01().getComment();
+                        if (laundry != null) {
+                            livingData.add("빨래지수: " + laundry);
+                            mListener.onIndexResponseAvailable();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Data> call_Laundry, Throwable t) {
+                @Override
+                public void onFailure(Call<Data> call_Laundry, Throwable t) {
 
-            }
-        });
+                }
+            });
+
+        }
 
         //통신 가로채서 값 보여주는 것
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();

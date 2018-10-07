@@ -157,7 +157,7 @@ public class CustomAutoCompleteAdapter extends ArrayAdapter implements Filterabl
             prediction_item=new ArrayList<>();
 
             for(AutocompletePrediction prediction:autoCompleteList){
-                    auto_result.add(prediction.getFullText(null).toString());
+                    auto_result.add(prediction.getFullText(null).toString().substring(5));
                     prediction_item.add(prediction);
             }
 

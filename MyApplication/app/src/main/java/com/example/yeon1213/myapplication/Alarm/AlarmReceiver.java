@@ -16,11 +16,15 @@ import com.example.yeon1213.myapplication.Main.ResponseListener;
 import com.example.yeon1213.myapplication.Main.WeatherData;
 import com.example.yeon1213.myapplication.R;
 
+import static com.example.yeon1213.myapplication.Main.MainActivity.EXTRA_LATITUDE;
+import static com.example.yeon1213.myapplication.Main.MainActivity.EXTRA_LONGITUDE;
+
 public class AlarmReceiver extends BroadcastReceiver implements ResponseListener {
 
     private static final String TAG = "AlarmReceiver";
     private LocationDatabase locationDatabase;
     public static final String EXTRA_ALARM_ID = "com.example.yeon1213.myapplication.Alarm.alarm_id";
+
     private WeatherData receiver_weather_data;
     private String location_weather = "";
     private NotificationManager notificationManager;
@@ -70,15 +74,22 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
 
         LocationData locationData = locationDatabase.getLocationDAO().getData(id);
 
-        receiver_weather_data.getWeatherAPIData(locationData.getMLatitude(), locationData.getMLongitude());
+        double latitude=locationData.getMLatitude();
+        double longitude=locationData.getMLongitude();
+
+        receiver_weather_data.getWeatherAPIData(latitude, longitude);
 
         location_name = locationData.getMLocation_name();
 
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(500);
 
+        Intent main_intent=new Intent(context,MainActivity.class);
+        main_intent.putExtra(EXTRA_LATITUDE,latitude);
+        main_intent.putExtra(EXTRA_LONGITUDE,longitude);
+
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = PendingIntent.getActivity(context, 0, main_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         receiver_weather_data.setmListener(this);
     }
