@@ -10,10 +10,12 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,8 +45,6 @@ public class MainActivity extends AppCompatActivity{
 
     public static final String EXTRA_LATITUDE="com.example.yeon1213.myapplication.Alarm.latitude";
     public static final String EXTRA_LONGITUDE="com.example.yeon1213.myapplication.Alarm.longtitude";
-
-    private LocationListener[] mLocationListeners;
 
     public static Intent newIntent(Context context, double latitude, double longitude){
         Intent mainIntent = new Intent(context, MainActivity.class);
@@ -113,12 +113,25 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void reverse_address(){
+
+        ActionBar ab=getSupportActionBar();
+
+        TextView tv=new TextView(getApplicationContext());
+
+        ActionBar.LayoutParams lp=new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        tv.setLayoutParams(lp);
+
         //좌표를 주소로 변환
         final Geocoder geocoder=new Geocoder(this);
         List<Address> list=null;
         try {
             list = geocoder.getFromLocation(latitude, longitude, 10);
-            getSupportActionBar().setTitle(list.get(0).getAddressLine(0).substring(5));
+            tv.setText(list.get(0).getAddressLine(0).substring(5));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
+
+            ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            ab.setCustomView(tv);
+
         }catch (IOException e) {
             e.printStackTrace();
             Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");

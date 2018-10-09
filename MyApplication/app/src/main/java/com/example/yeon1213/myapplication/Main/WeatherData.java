@@ -125,8 +125,8 @@ public class WeatherData{
                         temperature = weatherData.getMinutely().get(temp).getTemperature().getTc();
                         precipitation = weatherData.getMinutely().get(temp).getPrecipitation().getSinceOntime();
                         humidity = weatherData.getMinutely().get(temp).getHumidity();
-                        wind = weatherData.getMinutely().get(temp).getWind().getWdir();
-                        station=weatherData.getMinutely().get(temp).getStation().getName();
+                        wind = weatherData.getMinutely().get(temp).getWind().getWspd();
+                        //station=weatherData.getMinutely().get(temp).getStation().getName();
 
                         mListener.onWeatherResponseAvailable();
                     }
@@ -137,6 +137,35 @@ public class WeatherData{
             public void onFailure(Call<Data> call, Throwable t) {
                 //프로그래스바 날씨 데이터를 받아오고 있습니다 띄우기
                 Log.e("fail", "" + t.toString());
+            }
+        });
+
+        //통신 가로채서 값 보여주는 것
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
+        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
+        //minutely의 station 값을 미세먼지가 늦게 받아와서 오류가 뜬다.// 어떻게 받을지 생각하기...
+        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY, 10, 10, 1, 1, "강남구", "DAILY", 1.3, "json");
+        call_dust.enqueue(new Callback<FineDust>() {
+            @Override
+            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
+                if (response.isSuccessful()) {
+                    //통합대기환경지수
+                    dust = response.body().getList().get(0).getKhaiGrade();
+                    dust_comment=commentFineDust(dust);
+
+                    Log.d("미세먼지", "" + dust);
+                    mListener.onWeatherResponseAvailable();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FineDust> call_dust, Throwable t) {
+                Log.e("미세먼지 에러", "" + t.toString());
             }
         });
     }
@@ -300,35 +329,6 @@ public class WeatherData{
             });
 
         }
-
-        //통신 가로채서 값 보여주는 것
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-        Retrofit dust_retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.DUST_BASEURL).build();
-        ApiService dust_apiService = dust_retrofit.create(ApiService.class);
-        //minutely의 station 값을 미세먼지가 늦게 받아와서 오류가 뜬다.// 어떻게 받을지 생각하기...
-        Call<FineDust> call_dust = dust_apiService.getDust(ApiService.DUST_APPKEY, 10, 10, 1, 1, "강남구", "DAILY", 1.3, "json");
-        call_dust.enqueue(new Callback<FineDust>() {
-            @Override
-            public void onResponse(Call<FineDust> call_dust, Response<FineDust> response) {
-                if (response.isSuccessful()) {
-                    //통합대기환경지수
-                    dust = response.body().getList().get(0).getKhaiGrade();
-                    dust_comment=commentFineDust(dust);
-
-                    Log.d("미세먼지", "" + dust);
-                    mListener.onIndexResponseAvailable();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<FineDust> call_dust, Throwable t) {
-                Log.e("미세먼지 에러", "" + t.toString());
-            }
-        });
     }
 
     private String commentFineDust(String dust){
