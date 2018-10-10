@@ -157,6 +157,7 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                     Toast.makeText(this, "설정을 마무리해주세요", Toast.LENGTH_SHORT).show();
                     break;
                 }
+
                 locationData.setMAlarmCheck(true);
 
                 LocationDAO locationDAO = database.getLocationDAO();
@@ -167,6 +168,14 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                 } else {
                     locationDAO.insert(locationData);
                 }
+
+                //locationData를 다시 가져오기 알람 id를 가져오기 위해
+                database=LocationDatabase.getDataBase(this);
+                int max=database.getLocationDAO().getLocation().size()-1;
+
+                int max_id=database.getLocationDAO().getLocation().get(max).getMId();
+
+                locationData.setMId(max_id);
 
                 //알람매니저 등록
                 alarm.setAlarm(this, locationData);

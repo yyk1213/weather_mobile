@@ -148,6 +148,7 @@ public class LivingWeather extends AppCompatActivity {
                     editor.putBoolean(living_weatherList.get(item_ID).getLiving_name(),false);
                 }
                 editor.commit();
+                setResult(RESULT_OK);
             }
         }
 
@@ -179,5 +180,10 @@ public class LivingWeather extends AppCompatActivity {
         public int getItemCount() {
             return index_Dataset.size();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

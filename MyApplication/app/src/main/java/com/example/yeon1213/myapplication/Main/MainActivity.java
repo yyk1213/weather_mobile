@@ -1,5 +1,6 @@
 package com.example.yeon1213.myapplication.Main;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,7 +34,7 @@ import java.util.List;
 import static com.example.yeon1213.myapplication.Living_Weather.LivingWeather.EXTRA_ACTIVITY_POSITION;
 
 public class MainActivity extends AppCompatActivity{
-    private TextView temperature, fine_dust, precipitation, humidity, wind;
+    private TextView temperature, fine_dust, precipitation, humidity, wind,current_location;
     private double latitude, longitude;
 
     private RecyclerView main_RecyclerView;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity{
     public static final String EXTRA_LATITUDE="com.example.yeon1213.myapplication.Alarm.latitude";
     public static final String EXTRA_LONGITUDE="com.example.yeon1213.myapplication.Alarm.longtitude";
 
+    private boolean intent_check=false;
     public static Intent newIntent(Context context, double latitude, double longitude){
         Intent mainIntent = new Intent(context, MainActivity.class);
 
@@ -110,27 +112,31 @@ public class MainActivity extends AppCompatActivity{
         main_weatherData.getWeatherAPIData(latitude,longitude);
         //선택 지수 값 가져오기
        main_weatherData.getIndexData(latitude,longitude);
+
+       //main_weatherData.getHealthIndex();
+
     }
 
     private void reverse_address(){
 
-        ActionBar ab=getSupportActionBar();
-
-        TextView tv=new TextView(getApplicationContext());
-
-        ActionBar.LayoutParams lp=new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
-        tv.setLayoutParams(lp);
+//        ActionBar ab=getSupportActionBar();
+//
+//        TextView tv=new TextView(getApplicationContext());
+//
+//        ActionBar.LayoutParams lp=new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+//        tv.setLayoutParams(lp);
 
         //좌표를 주소로 변환
         final Geocoder geocoder=new Geocoder(this);
         List<Address> list=null;
         try {
             list = geocoder.getFromLocation(latitude, longitude, 10);
-            tv.setText(list.get(0).getAddressLine(0).substring(5));
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
-
-            ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            ab.setCustomView(tv);
+//            tv.setText(list.get(0).getAddressLine(0).substring(5));
+//            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
+//
+//            ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+//            ab.setCustomView(tv);
+            current_location.setText(list.get(0).getAddressLine(0).substring(5));
 
         }catch (IOException e) {
             e.printStackTrace();
@@ -140,8 +146,56 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode==RESULT_OK) {
+            recycler_livingData.clear();
+            main_weatherData.getIndexData(latitude, longitude);
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//
+//        if(!intent_check) {
+//            //들어온 인텐트 값이 있으면
+//            if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
+//                latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
+//                longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
+//
+//                intent_check = true;
+//            }
+//        }
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        if(intent_check) {
+//            location_check();
+//            //주소로 액션바 타이틀 변경
+//            reverse_address();
+//
+//            recycler_livingData.clear();
+//
+//            //날씨 값 가져오기
+//            main_weatherData.getWeatherAPIData(latitude, longitude);
+//            //선택 지수 값 가져오기
+//            main_weatherData.getIndexData(latitude, longitude);
+//        }
+//
+//    }
+
+    //    @Override
+//    public void finish() {
+//        super.finish();
+//
+//        if(mIsRestoredToTop){
+//            ActivityManager taskManager=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
+//            taskManager.moveTaskToFront(getTaskId(),ActivityManager.MOVE_TASK_NO_USER_ACTION);
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -159,13 +213,13 @@ public class MainActivity extends AppCompatActivity{
                 Intent lifeIntent = new Intent(MainActivity.this, LivingWeather.class);
                 lifeIntent.putExtra(EXTRA_ACTIVITY_POSITION,item.getItemId());
 
-                startActivity(lifeIntent);
+                startActivityForResult(lifeIntent,0);
                 break;
             case R.id.health:
                 Intent healthIntent = new Intent(MainActivity.this, LivingWeather.class);
                 healthIntent.putExtra(EXTRA_ACTIVITY_POSITION,item.getItemId());
 
-                startActivity(healthIntent);
+                startActivityForResult(healthIntent,0);
                 break;
             case R.id.life_radius_setting:
                 Intent lifeSettingIntent = new Intent(MainActivity.this, LifeRadiusActivity.class);
@@ -195,6 +249,8 @@ public class MainActivity extends AppCompatActivity{
         precipitation = findViewById(R.id.precipitation);
         humidity = findViewById(R.id.humidity);
         wind = findViewById(R.id.wind);
+        current_location=findViewById(R.id.current_location);
+
     }
 
     //현재위치 받아오기

@@ -111,7 +111,7 @@ public class WeatherData{
 
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
         ApiService apiService = retrofit.create(ApiService.class);
-        //시간별 날씨---분단위로 바꾸기
+        //시간별 날씨
         Call<Data> call = apiService.getMinutely(ApiService.APPKEY, 2, latitude, longitude);
 
         call.enqueue(new Callback<Data>() {
@@ -166,6 +166,33 @@ public class WeatherData{
             @Override
             public void onFailure(Call<FineDust> call_dust, Throwable t) {
                 Log.e("미세먼지 에러", "" + t.toString());
+            }
+        });
+    }
+    public void getHealthIndex(){
+
+        //통신 가로채서 값 보여주는 것
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit retrofit = new Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.HEALTH_BASEURL).build();
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        Call<JsonObject> flower_object=apiService.getFolwer(ApiService.DUST_APPKEY,1100000000,"json");
+        flower_object.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                        String result=response.body().getAsJsonObject("Response").getAsJsonObject("body").getAsJsonObject("indexModel").get("today").toString();
+                        Log.d(""," "+result);
+                    }
+                }
+            @Override
+            public void onFailure(Call<JsonObject> flower_object, Throwable t) {
+                //프로그래스바 날씨 데이터를 받아오고 있습니다 띄우기
+                Log.e("fail", "" + t.toString());
             }
         });
     }

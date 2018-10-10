@@ -2,6 +2,7 @@ package com.example.yeon1213.myapplication.Main;
 
 import com.example.yeon1213.myapplication.Main.Weather.Data;
 import com.example.yeon1213.myapplication.Main.Weather.FineDust.FineDust;
+import com.google.gson.JsonObject;
 
 import javax.annotation.PropertyKey;
 
@@ -20,10 +21,8 @@ public interface ApiService {
     //미세먼지 API
     String DUST_BASEURL="http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/";
     String DUST_APPKEY="MATtWt3RcZepkS0jjT/K7V0A3Tw4EQoCRafIiHry+VgNWmhD+LqoYZeDwHvM4c9lSAz1CM2VtogaDyCIGcTH9w==";
-    //주소 API
-    String GEO_BASEURL="https://openapi.naver.com/v1/map/";
-    String GEO_CLIENTID="SVa3DObAz71FQeRG7ca0";
-    String GEO_SECRETKEY="QBOpFJfa2l";
+    //보건기상지수 API
+    String HEALTH_BASEURL="http://newsky2.kma.go.kr/iros/RetrieveWhoIndexService2/";
     @GET("current/hourly")
     Call<Data> getHourly(@Header("appKey")String appKey, @Query("version")int version,
                          @Query("lat")double lat, @Query("lon")double lon);
@@ -60,7 +59,6 @@ public interface ApiService {
                            @Query("pageSize")double pageSize,@Query("pageNo")double pageNo,@Query("startPage")double startPage,
                            @Query("stationName")String stationName,@Query("dataTerm")String dataTerm,@Query("ver")double ver,@Query("_returnType")String _returnType);
 
-    //좌표 주소변환API
-    @GET("reversegeocode")
-    Call<ResponseBody> getGeoCode(@Header("X-Naver-Client-Id")String clientId,@Header("X-Naver-Client-Secret")String clientSecret,@Query("query")String query);
+    @GET("getAsthmaWhoList")
+    Call<JsonObject> getFolwer(@Query("serviceKey")String serviceKey, @Query("areaNo")int areaNo,@Query("_type")String _type);
 }

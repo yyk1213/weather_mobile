@@ -16,6 +16,7 @@ import com.example.yeon1213.myapplication.Main.ResponseListener;
 import com.example.yeon1213.myapplication.Main.WeatherData;
 import com.example.yeon1213.myapplication.R;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.example.yeon1213.myapplication.Main.MainActivity.EXTRA_LATITUDE;
 import static com.example.yeon1213.myapplication.Main.MainActivity.EXTRA_LONGITUDE;
 
@@ -26,13 +27,12 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
     public static final String EXTRA_ALARM_ID = "com.example.yeon1213.myapplication.Alarm.alarm_id";
 
     private WeatherData receiver_weather_data;
-    private String location_weather = "";
+    private String location_weather;
     private NotificationManager notificationManager;
     private Notification notification;
     private PendingIntent pendingIntent;
     private String location_name;
     private Context noti_context;
-    private boolean getIndex_check=false;
 
     public static Intent newIntent(Context context, int id) {
         Intent receiverIntent = new Intent(context, BroadcastReceiver.class);
@@ -43,11 +43,19 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
 
     @Override
     public void onWeatherResponseAvailable() {
-//        if(!getIndex_check) {
-            location_weather += "온도:" + receiver_weather_data.getTemperature() + " ";
-            location_weather += "강수량:" + receiver_weather_data.getPrecipitation() + " ";
-            getIndex_check = true;
-//        }
+
+            location_weather="";
+
+            if(receiver_weather_data.getTemperature()!=null) {
+                location_weather += "온도:" + receiver_weather_data.getTemperature() + " ";
+            }
+
+            if(receiver_weather_data.getPrecipitation()!=null) {
+                location_weather += "강수량:" + receiver_weather_data.getPrecipitation() + " ";
+            }
+
+            else if(receiver_weather_data.getTemperature()==null && receiver_weather_data.getPrecipitation()==null)
+                location_weather+="정보 제공 불가";
 
         notification = new NotificationCompat.Builder(noti_context)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -91,6 +99,7 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
         Intent main_intent=new Intent(context,MainActivity.class);
         main_intent.putExtra(EXTRA_LATITUDE,latitude);
         main_intent.putExtra(EXTRA_LONGITUDE,longitude);
+        //main_intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         pendingIntent = PendingIntent.getActivity(context, 0, main_intent, PendingIntent.FLAG_UPDATE_CURRENT);
