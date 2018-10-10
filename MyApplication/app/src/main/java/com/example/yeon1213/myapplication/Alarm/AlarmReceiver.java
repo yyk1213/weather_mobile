@@ -32,6 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
     private PendingIntent pendingIntent;
     private String location_name;
     private Context noti_context;
+    private boolean getIndex_check=false;
 
     public static Intent newIntent(Context context, int id) {
         Intent receiverIntent = new Intent(context, BroadcastReceiver.class);
@@ -42,8 +43,11 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
 
     @Override
     public void onWeatherResponseAvailable() {
-        location_weather += "온도:" + receiver_weather_data.getTemperature() + " ";
-        location_weather += "강수량:" + receiver_weather_data.getPrecipitation() + " ";
+//        if(!getIndex_check) {
+            location_weather += "온도:" + receiver_weather_data.getTemperature() + " ";
+            location_weather += "강수량:" + receiver_weather_data.getPrecipitation() + " ";
+            getIndex_check = true;
+//        }
 
         notification = new NotificationCompat.Builder(noti_context)
                 .setSmallIcon(R.mipmap.ic_launcher)
