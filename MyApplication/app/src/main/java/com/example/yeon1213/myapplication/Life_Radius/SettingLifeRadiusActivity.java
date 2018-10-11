@@ -167,15 +167,15 @@ public class SettingLifeRadiusActivity extends AppCompatActivity implements View
                     locationDAO.update(locationData);
                 } else {
                     locationDAO.insert(locationData);
+
+                    //locationData를 다시 가져오기 알람 id를 가져오기 위해
+                    database=LocationDatabase.getDataBase(this);
+                    int max=database.getLocationDAO().getLocation().size()-1;
+
+                    int max_id=database.getLocationDAO().getLocation().get(max).getMId();
+
+                    locationData.setMId(max_id);
                 }
-
-                //locationData를 다시 가져오기 알람 id를 가져오기 위해
-                database=LocationDatabase.getDataBase(this);
-                int max=database.getLocationDAO().getLocation().size()-1;
-
-                int max_id=database.getLocationDAO().getLocation().get(max).getMId();
-
-                locationData.setMId(max_id);
 
                 //알람매니저 등록
                 alarm.setAlarm(this, locationData);
