@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity{
                 temperature.setText(main_weatherData.getTemperature());
                 fine_dust.setText(main_weatherData.getDust()+" "+main_weatherData.getDust_comment());
                 precipitation.setText(main_weatherData.getPrecipitation());
-                humidity.setText(main_weatherData.getHumidity());
+                //humidity.setText(main_weatherData.getHumidity());
                 wind.setText(main_weatherData.getWind());
             }
 
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity{
 //
 //            ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 //            ab.setCustomView(tv);
-            current_location.setText(list.get(0).getAddressLine(0).substring(5));
+            current_location.setText(list.get(1).getAddressLine(0).substring(5));
 
         }catch (IOException e) {
             e.printStackTrace();
@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity{
                 main_weatherData.getWeatherAPIData(latitude,longitude);
                 //선택 지수 값 가져오기
                 main_weatherData.getIndexData(latitude,longitude);
+
                 reverse_address();
         }
         return true;
@@ -247,7 +248,7 @@ public class MainActivity extends AppCompatActivity{
         temperature = findViewById(R.id.temperature);
         fine_dust = findViewById(R.id.fine_dust);
         precipitation = findViewById(R.id.precipitation);
-        humidity = findViewById(R.id.humidity);
+        //humidity = findViewById(R.id.humidity);
         wind = findViewById(R.id.wind);
         current_location=findViewById(R.id.current_location);
 
@@ -351,7 +352,8 @@ public class MainActivity extends AppCompatActivity{
         }
 
         //최근 위치 정보 확인-- 현재 위치를 찾을 수 없을 때만 실행
-        Location[] locations={ mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER),mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)};
+        Location[] locations={ mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER),
+        mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)};
 
         for(int i=0; i<locations.length; i++) {
             if (locations[i] != null) {

@@ -124,7 +124,7 @@ public class WeatherData{
                     if (weatherData != null) {
                         temperature = weatherData.getMinutely().get(temp).getTemperature().getTc();
                         precipitation = weatherData.getMinutely().get(temp).getPrecipitation().getSinceOntime();
-                        humidity = weatherData.getMinutely().get(temp).getHumidity();
+                        //humidity = weatherData.getMinutely().get(temp).getHumidity();
                         wind = weatherData.getMinutely().get(temp).getWind().getWspd();
                         //station=weatherData.getMinutely().get(temp).getStation().getName();
 
