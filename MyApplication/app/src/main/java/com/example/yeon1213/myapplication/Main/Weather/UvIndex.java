@@ -3,7 +3,8 @@ package com.example.yeon1213.myapplication.Main.Weather;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Uvindex {
+public class UvIndex {
+
     @SerializedName("grid")
     @Expose
     private Grid grid;
@@ -48,4 +49,5 @@ public class Uvindex {
     public void setDay02(Day02 day02) {
         this.day02 = day02;
     }
+
 }
