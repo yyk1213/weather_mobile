@@ -99,10 +99,10 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
         Intent main_intent=new Intent(context,MainActivity.class);
         main_intent.putExtra(EXTRA_LATITUDE,latitude);
         main_intent.putExtra(EXTRA_LONGITUDE,longitude);
-        //main_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        pendingIntent = PendingIntent.getActivity(context, 0, main_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = PendingIntent.getActivity(context, 2, main_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         receiver_weather_data.setmListener(this);
     }

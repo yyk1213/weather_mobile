@@ -160,57 +160,23 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onNewIntent(Intent intent) {
-//
-//            //들어온 인텐트 값이 있으면
-//            if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
-//                latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
-//                longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
-//
-//                recycler_livingData.clear();
-//                reverse_address();
-//
-//                //날씨 값 가져오기
-//                main_weatherData.getWeatherAPIData(latitude,longitude);
-//                //선택 지수 값 가져오기
-//                main_weatherData.getIndexData(latitude,longitude);
-//            }
+
         super.onNewIntent(intent);
         setIntent(intent);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-//
-//        if(intent_check) {
-//            location_check();
-//            //주소로 액션바 타이틀 변경
-//            reverse_address();
-//
-//            recycler_livingData.clear();
-//
-//            //날씨 값 가져오기
-//            main_weatherData.getWeatherAPIData(latitude, longitude);
-//            //선택 지수 값 가져오기
-//            main_weatherData.getIndexData(latitude, longitude);
-//        }
+            //들어온 인텐트 값이 있으면
+            if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
+                latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
+                longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
 
-    }
+                recycler_livingData.clear();
+                reverse_address();
 
-    //    @Override
-//    public void finish() {
-//        super.finish();
-//
-//        if(mIsRestoredToTop){
-//            ActivityManager taskManager=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
-//            taskManager.moveTaskToFront(getTaskId(),ActivityManager.MOVE_TASK_NO_USER_ACTION);
-//        }
-//    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+                //날씨 값 가져오기
+                main_weatherData.getWeatherAPIData(latitude,longitude);
+                //선택 지수 값 가져오기
+                main_weatherData.getIndexData(latitude,longitude);
+            }
     }
 
     @Override
