@@ -35,7 +35,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class WeatherData{
 
     private Weather weatherData; //날씨 데이터 넣는 것
-    private List<String> livingData=new ArrayList<>();//리사이클러뷰에 담는 생활기상지수
+    private List<String> livingData;//리사이클러뷰에 담는 생활기상지수
     private ResponseListener mListener;//응답 값이 왔는지 확인하는 리스너
     private Context context;
     //날씨 데이터
@@ -124,7 +124,12 @@ public class WeatherData{
                     if (weatherData != null) {
                         temperature = weatherData.getMinutely().get(temp).getTemperature().getTc();
                         precipitation = weatherData.getMinutely().get(temp).getPrecipitation().getSinceOntime();
-                        //humidity = weatherData.getMinutely().get(temp).getHumidity();
+                        humidity = weatherData.getMinutely().get(temp).getHumidity();
+
+                        if(humidity==""){
+                            humidity=weatherData.getMinutely().get(0).getNearValue().getHumidity();
+                        }
+
                         wind = weatherData.getMinutely().get(temp).getWind().getWspd();
                         //station=weatherData.getMinutely().get(temp).getStation().getName();
 
@@ -199,10 +204,13 @@ public class WeatherData{
 
     public void getIndexData(double latitude, double longitude) {
 
+        livingData=new ArrayList<>();
+
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiService.BASEURL).build();
         ApiService apiService = retrofit.create(ApiService.class);
 
         SharedPreferences indexSetting_pref=context.getSharedPreferences("index_setting", MODE_PRIVATE);
+
         boolean fire_Index=indexSetting_pref.getBoolean("열지수",false);
 
         if(fire_Index) {
@@ -314,7 +322,7 @@ public class WeatherData{
                 public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
                     if (response.isSuccessful()) {
                         uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
-                        Log.d("uvIndex", "" + uvIndex);
+
                         if (uvIndex != null) {
                             livingData.add("자외선지수: " + uvIndex);
                             mListener.onIndexResponseAvailable();
@@ -355,6 +363,10 @@ public class WeatherData{
                 }
             });
 
+        }
+
+        else if(livingData.size()==0) {
+            mListener.onIndexResponseAvailable();
         }
     }
 

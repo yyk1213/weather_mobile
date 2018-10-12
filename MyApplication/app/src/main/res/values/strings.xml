@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YEON</string>
+    <string name="app_name">My Weather</string>
     <string name="setting">설정</string>
     <string name="title_activity_settings">Settings</string>
 

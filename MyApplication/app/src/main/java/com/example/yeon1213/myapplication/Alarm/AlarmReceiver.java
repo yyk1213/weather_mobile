@@ -58,7 +58,7 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
                 location_weather+="정보 제공 불가";
 
         notification = new NotificationCompat.Builder(noti_context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.noti_launcher)
                 .setContentIntent(pendingIntent)
                 .setContentTitle(location_name)
                 .setContentText(location_weather)
@@ -99,7 +99,7 @@ public class AlarmReceiver extends BroadcastReceiver implements ResponseListener
         Intent main_intent=new Intent(context,MainActivity.class);
         main_intent.putExtra(EXTRA_LATITUDE,latitude);
         main_intent.putExtra(EXTRA_LONGITUDE,longitude);
-        //main_intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        //main_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         pendingIntent = PendingIntent.getActivity(context, 0, main_intent, PendingIntent.FLAG_UPDATE_CURRENT);

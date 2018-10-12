@@ -1,5 +1,6 @@
 package com.example.yeon1213.myapplication.Main;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.util.Log.e;
 import static com.example.yeon1213.myapplication.Living_Weather.LivingWeather.EXTRA_ACTIVITY_POSITION;
 
 public class MainActivity extends AppCompatActivity{
@@ -47,7 +49,9 @@ public class MainActivity extends AppCompatActivity{
     public static final String EXTRA_LATITUDE="com.example.yeon1213.myapplication.Alarm.latitude";
     public static final String EXTRA_LONGITUDE="com.example.yeon1213.myapplication.Alarm.longtitude";
 
+    public static final int MY_PERMISSIONS_REQUEST = 0;
     private boolean intent_check=false;
+
     public static Intent newIntent(Context context, double latitude, double longitude){
         Intent mainIntent = new Intent(context, MainActivity.class);
 
@@ -85,9 +89,9 @@ public class MainActivity extends AppCompatActivity{
             public void onWeatherResponseAvailable() {
                 temperature.setText(main_weatherData.getTemperature());
                 fine_dust.setText(main_weatherData.getDust()+" "+main_weatherData.getDust_comment());
-                precipitation.setText(main_weatherData.getPrecipitation());
-                //humidity.setText(main_weatherData.getHumidity());
-                wind.setText(main_weatherData.getWind());
+                precipitation.setText(" "+main_weatherData.getPrecipitation());
+                humidity.setText(" "+main_weatherData.getHumidity());
+                wind.setText(" "+main_weatherData.getWind());
             }
 
             @Override
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity{
 
         }catch (IOException e) {
             e.printStackTrace();
-            Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
+            e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
         }
     }
 
@@ -151,26 +155,32 @@ public class MainActivity extends AppCompatActivity{
             recycler_livingData.clear();
             main_weatherData.getIndexData(latitude, longitude);
         }
-        super.onActivityResult(requestCode, resultCode, data);
+        //super.onActivityResult(requestCode, resultCode, data);
     }
 
-//    @Override
-//    protected void onNewIntent(Intent intent) {
+    @Override
+    protected void onNewIntent(Intent intent) {
 //
-//        if(!intent_check) {
 //            //들어온 인텐트 값이 있으면
 //            if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
 //                latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
 //                longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
 //
-//                intent_check = true;
-//            }
-//        }
-//    }
+//                recycler_livingData.clear();
+//                reverse_address();
 //
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
+//                //날씨 값 가져오기
+//                main_weatherData.getWeatherAPIData(latitude,longitude);
+//                //선택 지수 값 가져오기
+//                main_weatherData.getIndexData(latitude,longitude);
+//            }
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 //
 //        if(intent_check) {
 //            location_check();
@@ -184,8 +194,8 @@ public class MainActivity extends AppCompatActivity{
 //            //선택 지수 값 가져오기
 //            main_weatherData.getIndexData(latitude, longitude);
 //        }
-//
-//    }
+
+    }
 
     //    @Override
 //    public void finish() {
@@ -196,6 +206,12 @@ public class MainActivity extends AppCompatActivity{
 //            taskManager.moveTaskToFront(getTaskId(),ActivityManager.MOVE_TASK_NO_USER_ACTION);
 //        }
 //    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -248,10 +264,9 @@ public class MainActivity extends AppCompatActivity{
         temperature = findViewById(R.id.temperature);
         fine_dust = findViewById(R.id.fine_dust);
         precipitation = findViewById(R.id.precipitation);
-        //humidity = findViewById(R.id.humidity);
+        humidity = findViewById(R.id.humidity);
         wind = findViewById(R.id.wind);
         current_location=findViewById(R.id.current_location);
-
     }
 
     //현재위치 받아오기
@@ -322,7 +337,10 @@ public class MainActivity extends AppCompatActivity{
 
         //위치 정보 수신 체크--안돼있으면 어떡하지?
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{ Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST);
         }
 
         //위치 매니저 초기화
@@ -351,7 +369,7 @@ public class MainActivity extends AppCompatActivity{
             Log.d("MainActivity", "network provider does not exist, " + ex.getMessage());
         }
 
-        //최근 위치 정보 확인-- 현재 위치를 찾을 수 없을 때만 실행
+        //최근 위치 정보 확인
         Location[] locations={ mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER),
         mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)};
 

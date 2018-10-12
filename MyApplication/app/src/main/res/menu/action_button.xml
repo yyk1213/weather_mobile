@@ -5,6 +5,6 @@
     <item
         android:id="@+id/change_location"
         android:title="current_location"
-        android:icon="@android:drawable/ic_menu_mapmode"
+        android:icon="@drawable/current_location"
         app:showAsAction="always"/>
 </menu>

@@ -35,6 +35,18 @@ public class Minutely {
     @Expose
     private String timeObservation;
 
+    @SerializedName("NearValue")
+    @Expose
+    private NearValue nearValue;
+
+    public NearValue getNearValue() {
+        return nearValue;
+    }
+
+    public void setNearValue(NearValue nearValue) {
+        this.nearValue = nearValue;
+    }
+
     public Station getStation() {
         return station;
     }
