@@ -19,5 +19,5 @@
  <item
      android:id="@+id/weather_alarm"
      android:orderInCategory="100"
-     android:title="날씨 알람설정"/>
+     android:title="날씨 D-day 설정"/>
 </menu>
