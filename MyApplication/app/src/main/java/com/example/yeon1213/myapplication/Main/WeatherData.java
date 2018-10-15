@@ -313,7 +313,7 @@ public class WeatherData{
                 @Override
                 public void onResponse(Call<Data> call_uvIndex, Response<Data> response) {
                     if (response.isSuccessful()) {
-                        uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay00().getComment();
+                        uvIndex = response.body().getWeather().getWIndex().getUvIndex().get(0).getDay01().getComment();
                         Log.d("uvIndex", "" + uvIndex);
                         if (uvIndex != null) {
                             livingData.add("자외선지수: " + uvIndex);
