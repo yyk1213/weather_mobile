@@ -57,17 +57,16 @@ public class WIndex {
 
     @SerializedName("uvindex")
     @Expose
-    private List<UvIndex> uvindex = null;
+    private List<UvIndex> uvIndex = null;
     @SerializedName("timeRelease")
     @Expose
     private String timeRelease;
-
     public List<UvIndex> getUvIndex() {
-        return uvindex;
+        return uvIndex;
     }
 
     public void setUvIndex(List<UvIndex> uvIndex) {
-        this.uvindex = uvindex;
+        this.uvIndex = uvIndex;
     }
 
     public String getTimeRelease() {
