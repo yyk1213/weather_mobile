@@ -118,7 +118,7 @@ public class WeatherData{
             @Override
             public void onResponse(Call<Data> call, Response<Data> response) {
                 if (response.isSuccessful()) {
-                    //시간별 데이터를 받음-- 나중에 분별로 바꾸기
+
                     weatherData = response.body().getWeather();
 
                     if (weatherData != null) {

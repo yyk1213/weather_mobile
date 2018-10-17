@@ -9,6 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/currentlocation" />
+            <option value="$PROJECT_DIR$/indexdatalibrary" />
+            <option value="$PROJECT_DIR$/weatherdata" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

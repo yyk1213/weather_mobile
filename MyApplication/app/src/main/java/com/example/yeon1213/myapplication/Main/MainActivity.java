@@ -35,8 +35,8 @@ import java.util.List;
 import static android.util.Log.e;
 import static com.example.yeon1213.myapplication.Living_Weather.LivingWeather.EXTRA_ACTIVITY_POSITION;
 
-public class MainActivity extends AppCompatActivity{
-    private TextView temperature, fine_dust, precipitation, humidity, wind,current_location;
+public class MainActivity extends AppCompatActivity {
+    private TextView temperature, fine_dust, precipitation, humidity, wind, current_location;
     private double latitude, longitude;
 
     private RecyclerView main_RecyclerView;
@@ -46,16 +46,15 @@ public class MainActivity extends AppCompatActivity{
     private List<String> recycler_livingData = new ArrayList<>();
     private WeatherData main_weatherData;
 
-    public static final String EXTRA_LATITUDE="com.example.yeon1213.myapplication.Alarm.latitude";
-    public static final String EXTRA_LONGITUDE="com.example.yeon1213.myapplication.Alarm.longtitude";
+    public static final String EXTRA_LATITUDE = "com.example.yeon1213.myapplication.Alarm.latitude";
+    public static final String EXTRA_LONGITUDE = "com.example.yeon1213.myapplication.Alarm.longtitude";
 
     public static final int MY_PERMISSIONS_REQUEST = 0;
-    private boolean intent_check=false;
 
-    public static Intent newIntent(Context context, double latitude, double longitude){
+    public static Intent newIntent(Context context, double latitude, double longitude) {
         Intent mainIntent = new Intent(context, MainActivity.class);
 
-        mainIntent.putExtra(EXTRA_LATITUDE,latitude);
+        mainIntent.putExtra(EXTRA_LATITUDE, latitude);
         mainIntent.putExtra(EXTRA_LONGITUDE, longitude);
 
         return mainIntent;
@@ -84,14 +83,14 @@ public class MainActivity extends AppCompatActivity{
 //        startService(i);
 
         //데이터 가져오면 값 넣기
-        ResponseListener responseListener=new ResponseListener() {
+        ResponseListener responseListener = new ResponseListener() {
             @Override
             public void onWeatherResponseAvailable() {
                 temperature.setText(main_weatherData.getTemperature());
-                fine_dust.setText(main_weatherData.getDust()+" "+main_weatherData.getDust_comment());
-                precipitation.setText(" "+main_weatherData.getPrecipitation());
-                humidity.setText(" "+main_weatherData.getHumidity());
-                wind.setText(" "+main_weatherData.getWind());
+                fine_dust.setText(main_weatherData.getDust() + " " + main_weatherData.getDust_comment());
+                precipitation.setText(" " + main_weatherData.getPrecipitation());
+                humidity.setText(" " + main_weatherData.getHumidity());
+                wind.setText(" " + main_weatherData.getWind());
             }
 
             @Override
@@ -113,15 +112,15 @@ public class MainActivity extends AppCompatActivity{
         main_RecyclerView.setLayoutManager(main_LayoutManager);
 
         //날씨 값 가져오기
-        main_weatherData.getWeatherAPIData(latitude,longitude);
+        main_weatherData.getWeatherAPIData(latitude, longitude);
         //선택 지수 값 가져오기
-       main_weatherData.getIndexData(latitude,longitude);
+        main_weatherData.getIndexData(latitude, longitude);
 
-       //main_weatherData.getHealthIndex();
+        //main_weatherData.getHealthIndex();
 
     }
 
-    private void reverse_address(){
+    private void reverse_address() {
 
 //        ActionBar ab=getSupportActionBar();
 //
@@ -131,8 +130,8 @@ public class MainActivity extends AppCompatActivity{
 //        tv.setLayoutParams(lp);
 
         //좌표를 주소로 변환
-        final Geocoder geocoder=new Geocoder(this);
-        List<Address> list=null;
+        final Geocoder geocoder = new Geocoder(this);
+        List<Address> list = null;
         try {
             list = geocoder.getFromLocation(latitude, longitude, 10);
 //            tv.setText(list.get(0).getAddressLine(0).substring(5));
@@ -142,7 +141,7 @@ public class MainActivity extends AppCompatActivity{
 //            ab.setCustomView(tv);
             current_location.setText(list.get(1).getAddressLine(0).substring(5));
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
         }
@@ -151,7 +150,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(resultCode==RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             recycler_livingData.clear();
             main_weatherData.getIndexData(latitude, longitude);
         }
@@ -164,19 +163,19 @@ public class MainActivity extends AppCompatActivity{
         super.onNewIntent(intent);
         setIntent(intent);
 
-            //들어온 인텐트 값이 있으면
-            if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
-                latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
-                longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
+        //들어온 인텐트 값이 있으면
+        if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
+            latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
+            longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
 
-                recycler_livingData.clear();
-                reverse_address();
+            recycler_livingData.clear();
+            reverse_address();
 
-                //날씨 값 가져오기
-                main_weatherData.getWeatherAPIData(latitude,longitude);
-                //선택 지수 값 가져오기
-                main_weatherData.getIndexData(latitude,longitude);
-            }
+            //날씨 값 가져오기
+            main_weatherData.getWeatherAPIData(latitude, longitude);
+            //선택 지수 값 가져오기
+            main_weatherData.getIndexData(latitude, longitude);
+        }
     }
 
     @Override
@@ -193,15 +192,15 @@ public class MainActivity extends AppCompatActivity{
         switch (item.getItemId()) {
             case R.id.life:
                 Intent lifeIntent = new Intent(MainActivity.this, LivingWeather.class);
-                lifeIntent.putExtra(EXTRA_ACTIVITY_POSITION,item.getItemId());
+                lifeIntent.putExtra(EXTRA_ACTIVITY_POSITION, item.getItemId());
 
-                startActivityForResult(lifeIntent,0);
+                startActivityForResult(lifeIntent, 0);
                 break;
             case R.id.health:
                 Intent healthIntent = new Intent(MainActivity.this, LivingWeather.class);
-                healthIntent.putExtra(EXTRA_ACTIVITY_POSITION,item.getItemId());
+                healthIntent.putExtra(EXTRA_ACTIVITY_POSITION, item.getItemId());
 
-                startActivityForResult(healthIntent,0);
+                startActivityForResult(healthIntent, 0);
                 break;
             case R.id.life_radius_setting:
                 Intent lifeSettingIntent = new Intent(MainActivity.this, LifeRadiusActivity.class);
@@ -217,9 +216,9 @@ public class MainActivity extends AppCompatActivity{
                 recycler_livingData.clear();
 
                 //날씨 값 가져오기
-                main_weatherData.getWeatherAPIData(latitude,longitude);
+                main_weatherData.getWeatherAPIData(latitude, longitude);
                 //선택 지수 값 가져오기
-                main_weatherData.getIndexData(latitude,longitude);
+                main_weatherData.getIndexData(latitude, longitude);
 
                 reverse_address();
         }
@@ -232,11 +231,11 @@ public class MainActivity extends AppCompatActivity{
         precipitation = findViewById(R.id.precipitation);
         humidity = findViewById(R.id.humidity);
         wind = findViewById(R.id.wind);
-        current_location=findViewById(R.id.current_location);
+        current_location = findViewById(R.id.current_location);
     }
 
     //현재위치 받아오기
-    private void location_check(){
+    private boolean location_check() {
 
         //database=LocationDatabase.getDataBase(this);
 
@@ -250,18 +249,19 @@ public class MainActivity extends AppCompatActivity{
 ////        }
 //       }
 //       else{//기존에 패턴 분석 DB가 없을 경우-- 우선 현재 위치를 불러오고 서비스에 위치값 저장 시작
-            //위치 받아오는 거는 서비스에서만 실행해서 그 값을 불러온다.
-            //우선은 특정 값으로 고정시켜 놓기
+        //위치 받아오는 거는 서비스에서만 실행해서 그 값을 불러온다.
+        //우선은 특정 값으로 고정시켜 놓기
 //        }
 
         //들어온 인텐트 값이 있으면
-        if((getIntent().getDoubleExtra(EXTRA_LATITUDE,0.0)!=0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE,0.0)!=0.0)){
-            latitude=getIntent().getDoubleExtra(EXTRA_LATITUDE,0.0);
-            longitude=getIntent().getDoubleExtra(EXTRA_LONGITUDE,0.0);
-        }
-        else{
+        if ((getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0) != 0.0) && (getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0) != 0.0)) {
+            latitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0.0);
+            longitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0.0);
+
+            return true;
+        } else {
             //현재위치 값 구하기
-            getCurrentLocation();
+            return getCurrentLocation();
         }
     }
 
@@ -296,74 +296,80 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private void getCurrentLocation(){
+    private boolean getCurrentLocation() {
 
         //네트워크 연결 가능한지 확인
-        if(!isNetworkAvailable()) return;
+        if (!isNetworkAvailable()) return false;
 
-        //위치 정보 수신 체크--안돼있으면 어떡하지?
+        //위치 정보 수신 체크
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this,
-                    new String[]{ Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST);
         }
 
-        //위치 매니저 초기화
-        LocationManager mLocationManager =(LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            //위치 매니저 초기화
+            LocationManager mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        LocationListener[]  mLocationListeners=new LocationListener[]{
-                new LocationListener(LocationManager.GPS_PROVIDER),
-                new LocationListener(LocationManager.NETWORK_PROVIDER)
-        };
+            LocationListener[] mLocationListeners = new LocationListener[]{
+                    new LocationListener(LocationManager.GPS_PROVIDER),
+                    new LocationListener(LocationManager.NETWORK_PROVIDER)
+            };
 
-        try{
-            //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1, mLocationListeners[0]);
-        }catch (java.lang.SecurityException ex) {
-            Log.i("MainActivity", "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d("MainActivity", "network provider does not exist, " + ex.getMessage());
-        }
-
-        try{
-            //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 1, mLocationListeners[1]);
-        }catch (java.lang.SecurityException ex) {
-            Log.i("MainActivity", "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d("MainActivity", "network provider does not exist, " + ex.getMessage());
-        }
-
-        //최근 위치 정보 확인
-        Location[] locations={ mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER),
-        mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)};
-
-        for(int i=0; i<locations.length; i++) {
-            if (locations[i] != null) {
-                latitude = locations[i].getLatitude();
-                longitude = locations[i].getLongitude();
+            try {
+                //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1, mLocationListeners[0]);
+            } catch (java.lang.SecurityException ex) {
+                Log.i("MainActivity", "fail to request location update, ignore", ex);
+            } catch (IllegalArgumentException ex) {
+                Log.d("MainActivity", "network provider does not exist, " + ex.getMessage());
             }
-        }
 
-        //위치정보 미 수신할 때 자원해제
-        if (mLocationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
-                try {
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
-                } catch (Exception ex) {
-                    Log.i("MainActivity", "fail to remove location listners, ignore", ex);
+            try {
+                //GPS 제공자 정보가 바뀌면 콜백하도록 리스너 등록
+                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 1, mLocationListeners[1]);
+            } catch (java.lang.SecurityException ex) {
+                Log.i("MainActivity", "fail to request location update, ignore", ex);
+            } catch (IllegalArgumentException ex) {
+                Log.d("MainActivity", "network provider does not exist, " + ex.getMessage());
+            }
+
+            //최근 위치 정보 확인
+            Location[] locations = {mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER),
+                    mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)};
+
+            for (int i = 0; i < locations.length; i++) {
+                if (locations[i] != null) {
+                    latitude = locations[i].getLatitude();
+                    longitude = locations[i].getLongitude();
                 }
             }
+
+            //위치정보 미 수신할 때 자원해제
+            if (mLocationManager != null) {
+                for (int i = 0; i < mLocationListeners.length; i++) {
+                    try {
+                        mLocationManager.removeUpdates(mLocationListeners[i]);
+                    } catch (Exception ex) {
+                        Log.i("MainActivity", "fail to remove location listners, ignore", ex);
+                    }
+                }
+            }
+
+            return true;
         }
+        return false;
     }
 
-    private boolean isNetworkAvailable(){
-        ConnectivityManager cm=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+    private boolean isNetworkAvailable() {
 
-        boolean isNetworkAvailable=cm.getActiveNetworkInfo()!=null;
-        boolean isNetworkConnected=isNetworkAvailable && cm.getActiveNetworkInfo().isConnected();
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
+        boolean isNetworkAvailable = cm.getActiveNetworkInfo() != null;
+        boolean isNetworkConnected = isNetworkAvailable && cm.getActiveNetworkInfo().isConnected();
+        //네트워크 연결 안될 시 팝업창 뜨게 하기
         return isNetworkConnected;
     }
 }
